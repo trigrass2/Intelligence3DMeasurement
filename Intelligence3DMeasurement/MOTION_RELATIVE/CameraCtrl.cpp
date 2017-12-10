@@ -50,10 +50,6 @@ void CameraCtrl::showEvent(QShowEvent *event)
 
 	SetProfile();
 
-#if REPLACE_HALCON_LIB
-		if (!camera.isOpened()) { camera.open(0); }
-#endif // REPLACE_HALCON_LIB
-
 	m_updateTimer.start();
 
 	QDialog::showEvent(event);
@@ -62,11 +58,6 @@ void CameraCtrl::showEvent(QShowEvent *event)
 void CameraCtrl::closeEvent(QCloseEvent *event)
 {
 	m_updateTimer.stop();
-
-#if REPLACE_HALCON_LIB
-	camera.release();
-#endif // REPLACE_HALCON_LIB
-
 	on_stopBtn_clicked();
 	QDialog::closeEvent(event);
 }
@@ -75,24 +66,22 @@ void CameraCtrl::closeEvent(QCloseEvent *event)
  */
 void CameraCtrl::RealtimeCapture()
 {
-#if REPLACE_HALCON_LIB
-	if (!camera.isOpened()) {
-		qDebug() << "Camera cannot open!";
-		return;
-	}
+	//if (!camera.isOpened()) {
+	//	qDebug() << "Camera cannot open!";
+	//	return;
+	//}
 
-	Mat frame;
-	camera >> frame;
-	if (frame.empty()) {
-		qDebug() << "No accessible video stream!";
-		return;
-	}
+	//Mat frame;
+	//camera >> frame;
+	//if (frame.empty()) {
+	//	qDebug() << "No accessible video stream!";
+	//	return;
+	//}
 
-	cvtColor(frame, frame, CV_BGR2RGB);
-	QPixmap pixmap;
-	pixmap = QPixmap::fromImage(QImage((uchar*)frame.data, frame.cols, frame.rows, QImage::Format_RGB888));
-	emit SendAFrame(pixmap);
-#endif // REPLACE_HALCON_LIB
+	//cvtColor(frame, frame, CV_BGR2RGB);
+	//QPixmap pixmap;
+	//pixmap = QPixmap::fromImage(QImage((uchar*)frame.data, frame.cols, frame.rows, QImage::Format_RGB888));
+	//emit SendAFrame(pixmap);
 }
 /**
  * @brief ×´Ì¬ÏÔÊ¾

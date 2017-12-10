@@ -1,5 +1,8 @@
-﻿#ifndef ENTITIESPARSER4DXF_H
-#define ENTITIESPARSER4DXF_H
+﻿#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+
+#pragma once
 
 #include <QVector>
 #include <QFile>
@@ -125,5 +128,3 @@ private:
 	bool m_isAvailable;
 
 };
-
-#endif // ENTITIESPARSER4DXF_H

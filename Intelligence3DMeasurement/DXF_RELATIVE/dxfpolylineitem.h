@@ -3,9 +3,10 @@
 
 #include <QGraphicsItem>
 
-#include "dxf-graphicsitems\entitiesparser4dxf.h"
+#include "entitiesparser4dxf.h"
 
 #define POLY_PTR_CAST(i) qgraphicsitem_cast<DXFPolylineItem*>(i)
+
 
 class DXFPolylineItem : public QGraphicsItem
 {

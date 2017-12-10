@@ -1,5 +1,8 @@
-﻿#ifndef DXFRADIALDIMITEM_H
-#define DXFRADIALDIMITEM_H
+﻿#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+
+#pragma once
 
 #include <QGraphicsItem>
 #include <QFont>
@@ -7,6 +10,7 @@
 #include "entitiesparser4dxf.h"
 
 #define RADIAL_PTR_CAST(i) qgraphicsitem_cast<DXFRadialDimItem*>(i)
+
 
 class DXFRadialDimItem : public QGraphicsItem
 {
@@ -39,4 +43,3 @@ private:
 	double m_d_DimWidth;
 };
 
-#endif // DXFRADIALDIMITEM_H

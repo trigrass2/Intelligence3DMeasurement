@@ -1,8 +1,8 @@
-#include "PathItem.h"
-
 #include <QPen>
 #include <QPainter>
-#include <QDebug>
+#include "PathItem.h"
+
+
 PathItem::PathItem(const QVector<QPointF> & path, int diff)
 {
 	setFlag(QGraphicsItem::ItemIsSelectable, false);

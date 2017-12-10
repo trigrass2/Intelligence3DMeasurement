@@ -1,7 +1,7 @@
-﻿#include "dxfpolylineitem.h"
-
-#include <QPainter>
+﻿#include <QPainter>
 #include <QStyleOptionGraphicsItem>
+#include "dxfpolylineitem.h"
+
 
 DXFPolylineItem::DXFPolylineItem(const LWPOLYLINE &data):
 	m_hasProcessed(false)

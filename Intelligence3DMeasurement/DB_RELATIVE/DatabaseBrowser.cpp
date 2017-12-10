@@ -2,7 +2,8 @@
 #include <QSqlQuery>
 #include "DatabaseBrowser.h"
 
-#include "spc\spcwidget.h"
+#include "SPC_RELATIVE\spcwidget.h"
+
 
 DatabaseBrowser::DatabaseBrowser(QWidget *parent)
 	: QWidget(parent, Qt::Window)
@@ -102,7 +103,7 @@ void DatabaseBrowser::on_exportBtn_clicked()
 
 void DatabaseBrowser::on_spcBtn_clicked()
 {
-	int n;														// 子组容量
+	int n = 1;														// 子组容量
 	QVector<qreal> x, mean, r;
 	x << 1 << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9 << 10;		// 数据个数
 	mean << 1 << 2 << 3 << 4 << 5 << 6 << 7 << 8 << 9 << 10;	// 数据平均值

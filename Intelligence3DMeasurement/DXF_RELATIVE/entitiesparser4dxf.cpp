@@ -1,11 +1,7 @@
-﻿#if _MSC_VER >= 1600
-#pragma execution_character_set("utf-8")
-#endif
-
+﻿#include <QTextStream>
+#include <qmath.h>
 #include "entitiesparser4dxf.h"
 
-#include <QTextStream>
-#include <qmath.h>
 
 EntitiesParser4DXF::EntitiesParser4DXF(const QString &path):
 	m_isAvailable(false)

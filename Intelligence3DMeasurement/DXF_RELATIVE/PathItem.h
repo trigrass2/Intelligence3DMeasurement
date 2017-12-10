@@ -4,6 +4,7 @@
 
 #include "entitiesparser4dxf.h"
 
+
 class PathItem : public QGraphicsItem
 {
 

@@ -120,7 +120,7 @@
       <bool>true</bool>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>1</number>
      </property>
      <property name="documentMode">
       <bool>true</bool>
@@ -1203,7 +1203,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="mainui.qrc">:/MainUI/JPG_PULSE_MODE</pixmap>
+          <pixmap resource="../Intelligence3DMeasurement.qrc">:/PIC/PULSE_MODE</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -2635,6 +2635,7 @@
   <tabstop>inpLvLBox</tabstop>
  </tabstops>
  <resources>
+  <include location="../Intelligence3DMeasurement.qrc"/>
   <include location="mainui.qrc"/>
  </resources>
  <connections/>

@@ -3,7 +3,6 @@
 #include <QDialog>
 #include "ui_NewProjectDlg.h"
 
-#include <QFileDialog>
 
 class NewProjectDlg : public QDialog
 {

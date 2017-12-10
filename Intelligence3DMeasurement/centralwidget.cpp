@@ -1,6 +1,7 @@
 #include <QSettings>
 #include <QMessagebox>
 #include <QDateTime>
+#include <QFileDialog>
 #include "centralwidget.h"
 
 #include "LTDMC.h"

@@ -6,11 +6,6 @@
 
 #include "Global.h"
 
-#if REPLACE_HALCON_LIB
-#include "opencv2/opencv.hpp"
-using namespace cv;
-#endif // REPLACE_HALCON_LIB
-
 
 class CameraCtrl : public QDialog
 {
@@ -25,10 +20,6 @@ protected:
 
 private:
 	Ui::CameraCtrl ui;
-
-#if REPLACE_HALCON_LIB
-	VideoCapture camera;
-#endif // REPLACE_HALCON_LIB
 
 	int m_updateInternal;		///< msec
 	QTimer m_updateTimer;

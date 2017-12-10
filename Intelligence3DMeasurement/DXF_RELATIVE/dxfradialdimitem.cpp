@@ -1,12 +1,8 @@
-﻿#if _MSC_VER >= 1600
-#pragma execution_character_set("utf-8")
-#endif
-
-#include "dxfradialdimitem.h"
-
-#include <QPainter>
+﻿#include <QPainter>
 #include <QStyleOptionGraphicsItem>
 #include <qmath.h>
+#include "dxfradialdimitem.h"
+
 
 DXFRadialDimItem::DXFRadialDimItem(const RADIALDIM &data):
 	m_hasDeviation(true)

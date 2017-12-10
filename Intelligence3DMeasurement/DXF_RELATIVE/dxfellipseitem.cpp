@@ -1,8 +1,8 @@
-﻿#include "dxfellipseitem.h"
-
-#include <QPainter>
+﻿#include <QPainter>
 #include <QStyleOptionGraphicsItem>
 #include <qmath.h>
+#include "dxfellipseitem.h"
+
 
 DXFEllipseItem::DXFEllipseItem(const ARC &data):
 	m_hasProcessed(false), m_rotateAngle(0.0)

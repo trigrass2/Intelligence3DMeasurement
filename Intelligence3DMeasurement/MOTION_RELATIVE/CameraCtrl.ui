@@ -822,8 +822,8 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;向右移动&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="icon">
-        <iconset resource="mainui.qrc">
-         <normaloff>:/MainUI/ICO_ARROW_RIGHT</normaloff>:/MainUI/ICO_ARROW_RIGHT</iconset>
+        <iconset resource="../Intelligence3DMeasurement.qrc">
+         <normaloff>:/ICON/ARROW_RIGHT</normaloff>:/ICON/ARROW_RIGHT</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -851,8 +851,8 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;后退&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="icon">
-        <iconset resource="mainui.qrc">
-         <normaloff>:/MainUI/ICO_ARROW_UP</normaloff>:/MainUI/ICO_ARROW_UP</iconset>
+        <iconset resource="../Intelligence3DMeasurement.qrc">
+         <normaloff>:/ICON/ARROW_UP</normaloff>:/ICON/ARROW_UP</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -880,8 +880,8 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;前进&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="icon">
-        <iconset resource="mainui.qrc">
-         <normaloff>:/MainUI/ICO_ARROW_DOWN</normaloff>:/MainUI/ICO_ARROW_DOWN</iconset>
+        <iconset resource="../Intelligence3DMeasurement.qrc">
+         <normaloff>:/ICON/ARROW_DOWN</normaloff>:/ICON/ARROW_DOWN</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -912,8 +912,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="mainui.qrc">
-         <normaloff>:/MainUI/ICO_DROP</normaloff>:/MainUI/ICO_DROP</iconset>
+        <iconset resource="../Intelligence3DMeasurement.qrc">
+         <normaloff>:/ICON/DROP</normaloff>:/ICON/DROP</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -944,8 +944,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="mainui.qrc">
-         <normaloff>:/MainUI/ICO_RAISE</normaloff>:/MainUI/ICO_RAISE</iconset>
+        <iconset resource="../Intelligence3DMeasurement.qrc">
+         <normaloff>:/ICON/RAISE</normaloff>:/ICON/RAISE</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -973,8 +973,8 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;计数清零&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="icon">
-        <iconset resource="mainui.qrc">
-         <normaloff>:/MainUI/ICO_ORG</normaloff>:/MainUI/ICO_ORG</iconset>
+        <iconset resource="../Intelligence3DMeasurement.qrc">
+         <normaloff>:/ICON/CIRCLE_CLEAR</normaloff>:/ICON/CIRCLE_CLEAR</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -1005,8 +1005,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="mainui.qrc">
-         <normaloff>:/MainUI/ICO_STOP</normaloff>:/MainUI/ICO_STOP</iconset>
+        <iconset resource="../Intelligence3DMeasurement.qrc">
+         <normaloff>:/ICON/STOP</normaloff>:/ICON/STOP</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -1034,8 +1034,8 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;向左移动&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="icon">
-        <iconset resource="mainui.qrc">
-         <normaloff>:/MainUI/ICO_ARROW_LEFT</normaloff>:/MainUI/ICO_ARROW_LEFT</iconset>
+        <iconset resource="../Intelligence3DMeasurement.qrc">
+         <normaloff>:/ICON/ARROW_LEFT</normaloff>:/ICON/ARROW_LEFT</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -1066,8 +1066,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="mainui.qrc">
-         <normaloff>:/MainUI/ICO_HOME</normaloff>:/MainUI/ICO_HOME</iconset>
+        <iconset resource="../Intelligence3DMeasurement.qrc">
+         <normaloff>:/ICON/HOME_RETURN</normaloff>:/ICON/HOME_RETURN</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -1214,7 +1214,7 @@
   <tabstop>axis2Vel</tabstop>
  </tabstops>
  <resources>
-  <include location="mainui.qrc"/>
+  <include location="../Intelligence3DMeasurement.qrc"/>
  </resources>
  <connections/>
 </ui>

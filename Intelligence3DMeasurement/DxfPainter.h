@@ -8,7 +8,7 @@
 #include <QGraphicsScene>
 #include <QMenu>
 
-#include "dxf-graphicsitems\PathItem.h"
+#include "DXF_RELATIVE\PathItem.h"
 
 
 class DxfPainter : public QGraphicsView

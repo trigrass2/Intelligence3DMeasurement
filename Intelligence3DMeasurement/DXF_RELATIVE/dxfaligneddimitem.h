@@ -1,5 +1,8 @@
-﻿#ifndef DXFALIGNEDDIMITEM_H
-#define DXFALIGNEDDIMITEM_H
+﻿#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+
+#pragma once
 
 #include <QGraphicsItem>
 #include <QFont>
@@ -7,6 +10,7 @@
 #include "entitiesparser4dxf.h"
 
 #define ALIGNED_PTR_CAST(i) qgraphicsitem_cast<DXFAlignedDimItem*>(i)
+
 
 class DXFAlignedDimItem : public QGraphicsItem
 {
@@ -40,4 +44,3 @@ private:
 
 };
 
-#endif // DXFALIGNEDDIMITEM_H

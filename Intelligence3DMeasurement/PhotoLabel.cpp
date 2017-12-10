@@ -1,6 +1,6 @@
+#include <QPainter>
 #include "PhotoLabel.h"
 
-#include <QPainter>
 
 PhotoLabel::PhotoLabel(QWidget *parent)
 	: QLabel(parent), m_length(70)

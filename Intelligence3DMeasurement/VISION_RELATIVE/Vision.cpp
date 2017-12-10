@@ -3,6 +3,7 @@
 
 #include "Global.h"
 
+
 Vision::Vision(QObject *parent)
 	: QObject(parent)
 {

@@ -1,7 +1,7 @@
-#include "MarkItem.h"
-
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
+#include "MarkItem.h"
+
 
 MarkItem::MarkItem(int morph) : m_size(3.6), m_hasProcessed(false)
 {

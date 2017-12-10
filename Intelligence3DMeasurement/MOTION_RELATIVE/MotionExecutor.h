@@ -2,6 +2,7 @@
 
 #include <QThread>
 
+
 class MotionExecutor : public QThread
 {
 	Q_OBJECT

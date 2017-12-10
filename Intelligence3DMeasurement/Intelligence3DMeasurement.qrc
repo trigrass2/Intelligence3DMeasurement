@@ -10,4 +10,7 @@
         <file alias="RAISE">raise_128px.ico</file>
         <file alias="STOP">stop_128px.ico</file>
     </qresource>
+    <qresource prefix="/PIC">
+        <file alias="PULSE_MODE">pulsemode.JPG</file>
+    </qresource>
 </RCC>

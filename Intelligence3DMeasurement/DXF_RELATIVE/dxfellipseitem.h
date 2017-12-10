@@ -1,11 +1,11 @@
-﻿#ifndef DXFELLIPSEITEM_H
-#define DXFELLIPSEITEM_H
+﻿#pragma once
 
 #include <QGraphicsItem>
 
-#include "dxf-graphicsitems\entitiesparser4dxf.h"
+#include "entitiesparser4dxf.h"
 
 #define ELLIPSE_PTR_CAST(i) qgraphicsitem_cast<DXFEllipseItem*>(i)
+
 
 class DXFEllipseItem : public QGraphicsItem
 {
@@ -40,4 +40,3 @@ private:
 	bool m_hasProcessed;
 };
 
-#endif // DXFELLIPSEITEM_H

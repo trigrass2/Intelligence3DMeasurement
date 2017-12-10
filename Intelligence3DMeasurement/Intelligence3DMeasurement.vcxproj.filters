@@ -50,19 +50,34 @@
     <Filter Include="Source Files\SPC">
       <UniqueIdentifier>{396965d8-6432-4dab-9cc8-ba45d8b4e97c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\DB">
+      <UniqueIdentifier>{75d45828-5d95-48ac-8a76-9c41c1992900}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DB">
+      <UniqueIdentifier>{ef9048fb-7e83-46fe-a339-c83e7c3d4402}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Form Files\DB">
+      <UniqueIdentifier>{425eca3a-c95a-4078-a20a-ad61933532dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MOTION">
+      <UniqueIdentifier>{187a09d1-64c0-4f96-a481-3135ce9b66a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MOTION">
+      <UniqueIdentifier>{90b63db8-ec46-499d-bc1b-9cc6280ee67f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Form Files\MOTION">
+      <UniqueIdentifier>{31d7bcf9-e64b-435e-8fb3-75bcfd9c988b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\VISION">
+      <UniqueIdentifier>{c9beb6c2-8a8a-4a23-a557-d53b1bb797ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\VISION">
+      <UniqueIdentifier>{0f86a02d-0edb-4715-9cac-8f12fd48092f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Intelligence3DMeasurement.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_Intelligence3DMeasurement.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_Intelligence3DMeasurement.cpp">
-      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_Intelligence3DMeasurement.cpp">
       <Filter>Generated Files</Filter>
@@ -109,11 +124,137 @@
     <ClCompile Include="SPC_RELATIVE\spcwidget.cpp">
       <Filter>Source Files\SPC</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_centralwidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_centralwidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DxfPainter.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DxfPainter.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LaserPortCfgDlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LaserPortCfgDlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_NewProjectDlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_NewProjectDlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_PhotoLabel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_PhotoLabel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ProcessTypeCfgDlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ProcessTypeCfgDlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ReportGenerator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ReportGenerator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="centralwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DxfPainter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Global.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LaserPortCfgDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NewProjectDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PhotoLabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessTypeCfgDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReportGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DatabaseBrowser.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DatabaseBrowser.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DatabaseCfgDlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DatabaseCfgDlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="DB_RELATIVE\DatabaseBrowser.cpp">
+      <Filter>Source Files\DB</Filter>
+    </ClCompile>
+    <ClCompile Include="DB_RELATIVE\DatabaseCfgDlg.cpp">
+      <Filter>Source Files\DB</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CameraCtrl.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CameraCtrl.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MotionCtrlCfgDlg.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MotionCtrlCfgDlg.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MotionExecutor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MotionExecutor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="MOTION_RELATIVE\CameraCtrl.cpp">
+      <Filter>Source Files\MOTION</Filter>
+    </ClCompile>
+    <ClCompile Include="MOTION_RELATIVE\MotionCtrlCfgDlg.cpp">
+      <Filter>Source Files\MOTION</Filter>
+    </ClCompile>
+    <ClCompile Include="MOTION_RELATIVE\MotionExecutor.cpp">
+      <Filter>Source Files\MOTION</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_Vision.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_Vision.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="VISION_RELATIVE\Vision.cpp">
+      <Filter>Source Files\VISION</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_mainui.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_mainui.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="mainui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="Intelligence3DMeasurement.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="Intelligence3DMeasurement.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
@@ -125,6 +266,78 @@
     </CustomBuild>
     <CustomBuild Include="SPC_RELATIVE\spcwidget.h">
       <Filter>Header Files\SPC</Filter>
+    </CustomBuild>
+    <CustomBuild Include="centralwidget.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="DxfPainter.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LaserPortCfgDlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="NewProjectDlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="PhotoLabel.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ProcessTypeCfgDlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ReportGenerator.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="centralwidget.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LaserPortCfgDlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="NewProjectDlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ProcessTypeCfgDlg.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ReportGenerator.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="DB_RELATIVE\DatabaseBrowser.h">
+      <Filter>Header Files\DB</Filter>
+    </CustomBuild>
+    <CustomBuild Include="DB_RELATIVE\DatabaseCfgDlg.h">
+      <Filter>Header Files\DB</Filter>
+    </CustomBuild>
+    <CustomBuild Include="DB_RELATIVE\DatabaseBrowser.ui">
+      <Filter>Form Files\DB</Filter>
+    </CustomBuild>
+    <CustomBuild Include="DB_RELATIVE\DatabaseCfgDlg.ui">
+      <Filter>Form Files\DB</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MOTION_RELATIVE\CameraCtrl.h">
+      <Filter>Header Files\MOTION</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MOTION_RELATIVE\MotionCtrlCfgDlg.h">
+      <Filter>Header Files\MOTION</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MOTION_RELATIVE\MotionExecutor.h">
+      <Filter>Header Files\MOTION</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MOTION_RELATIVE\CameraCtrl.ui">
+      <Filter>Form Files\MOTION</Filter>
+    </CustomBuild>
+    <CustomBuild Include="MOTION_RELATIVE\MotionCtrlCfgDlg.ui">
+      <Filter>Form Files\MOTION</Filter>
+    </CustomBuild>
+    <CustomBuild Include="VISION_RELATIVE\Vision.h">
+      <Filter>Header Files\VISION</Filter>
+    </CustomBuild>
+    <CustomBuild Include="mainui.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="mainui.ui">
+      <Filter>Form Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +367,39 @@
     </ClInclude>
     <ClInclude Include="DXF_RELATIVE\PathItem.h">
       <Filter>Header Files\DXF</Filter>
+    </ClInclude>
+    <ClInclude Include="Global.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_centralwidget.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_LaserPortCfgDlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_NewProjectDlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ProcessTypeCfgDlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ReportGenerator.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_DatabaseBrowser.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_DatabaseCfgDlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_CameraCtrl.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_MotionCtrlCfgDlg.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_mainui.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

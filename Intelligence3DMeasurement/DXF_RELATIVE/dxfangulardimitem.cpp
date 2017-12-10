@@ -1,10 +1,7 @@
-﻿#if _MSC_VER >= 1600
-#pragma execution_character_set("utf-8")
-#endif
-
-#include "dxfangulardimitem.h"
-#include <QPainter>
+﻿#include <QPainter>
 #include <QStyleOptionGraphicsItem>
+#include "dxfangulardimitem.h"
+
 
 DXFAngularDimItem::DXFAngularDimItem(const ANGULARDIM &data):
 	m_hasDeviation(true), m_textAngle(0.0)

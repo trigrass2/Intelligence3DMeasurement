@@ -1,11 +1,7 @@
-﻿#if _MSC_VER >= 1600
-#pragma execution_character_set("utf-8")
-#endif
-
+﻿#include <QPainter>
+#include <QStyleOptionGraphicsItem>
 #include "dxfaligneddimitem.h"
 
-#include <QPainter>
-#include <QStyleOptionGraphicsItem>
 
 DXFAlignedDimItem::DXFAlignedDimItem(const ALIGNEDDIM &data):
 	m_hasDeviation(true)

@@ -1,7 +1,9 @@
 #include <QFileInfo>
+#include <QFileDialog>
 #include "NewProjectDlg.h"
 
 #include "Global.h"
+
 
 NewProjectDlg::NewProjectDlg(QWidget *parent)
 	: QDialog(parent)

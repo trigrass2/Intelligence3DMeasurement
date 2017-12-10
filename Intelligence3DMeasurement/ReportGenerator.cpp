@@ -5,6 +5,7 @@
 
 #include "Global.h"
 
+
 ReportGenerator::ReportGenerator(QWidget *parent)
 	: QDialog(parent), m_isNew(false)
 {

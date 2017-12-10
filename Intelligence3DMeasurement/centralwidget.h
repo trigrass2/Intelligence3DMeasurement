@@ -9,10 +9,10 @@
 #include "ui_centralwidget.h"
 
 #include "DxfPainter.h"
-#include "CameraCtrl.h"
-#include "MotionExecutor.h"
 #include "ReportGenerator.h"
-#include "Vision.h"
+#include "MOTION_RELATIVE\CameraCtrl.h"
+#include "MOTION_RELATIVE\MotionExecutor.h"
+#include "VISION_RELATIVE\Vision.h"
 
 
 class CentralWidget : public QWidget

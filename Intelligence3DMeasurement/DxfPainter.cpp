@@ -5,14 +5,13 @@
 #include <qmath.h>
 #include "DxfPainter.h"
 
+#include "DXF_RELATIVE\dxfellipseitem.h"
+#include "DXF_RELATIVE\dxfpolylineitem.h"
+#include "DXF_RELATIVE\dxfaligneddimitem.h"
+#include "DXF_RELATIVE\dxfangulardimitem.h"
+#include "DXF_RELATIVE\dxfradialdimitem.h"
+#include "DXF_RELATIVE\MarkItem.h"
 #include "Global.h"
-#include "dxf-graphicsitems\entitiesparser4dxf.h"
-#include "dxf-graphicsitems\dxfellipseitem.h"
-#include "dxf-graphicsitems\dxfpolylineitem.h"
-#include "dxf-graphicsitems\dxfaligneddimitem.h"
-#include "dxf-graphicsitems\dxfangulardimitem.h"
-#include "dxf-graphicsitems\dxfradialdimitem.h"
-#include "dxf-graphicsitems\MarkItem.h"
 
 #define P_DISTANCE(p1, p2) pow((p1.x()-p2.x()), 2) + pow((p1.y()-p2.y()), 2);
 

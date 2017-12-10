@@ -6,6 +6,7 @@
 
 #include "Global.h"
 
+
 LaserPortCfgDlg::LaserPortCfgDlg(QWidget *parent)
 	: QDialog(parent), m_currentIndex(9999)
 {

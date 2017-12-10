@@ -1,5 +1,6 @@
-#include "mainui.h"
 #include <QtWidgets/QApplication>
+#include "mainui.h"
+
 
 int main(int argc, char *argv[])
 {
