@@ -1,4 +1,13 @@
 <RCC>
-    <qresource prefix="Intelligence3DMeasurement">
+    <qresource prefix="/ICON">
+        <file alias="ARROW_DOWN">arrow_down_128px.ico</file>
+        <file alias="ARROW_LEFT">arrow_left_128px.ico</file>
+        <file alias="ARROW_RIGHT">arrow_right_128px.ico</file>
+        <file alias="ARROW_UP">arrow_up_128px.ico</file>
+        <file alias="CIRCLE_CLEAR">circle_128px.ico</file>
+        <file alias="DROP">drop_128px.ico</file>
+        <file alias="HOME_RETURN">Home_128px.ico</file>
+        <file alias="RAISE">raise_128px.ico</file>
+        <file alias="STOP">stop_128px.ico</file>
     </qresource>
 </RCC>

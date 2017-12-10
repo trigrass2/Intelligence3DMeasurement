@@ -38,6 +38,18 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Header Files\DXF">
+      <UniqueIdentifier>{291510da-952b-4999-ae09-189ba26d7302}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SPC">
+      <UniqueIdentifier>{65864268-d903-4809-937a-78f7edd28c59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DXF">
+      <UniqueIdentifier>{d0f9060a-f2e9-4798-a7cb-74d2be3762cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SPC">
+      <UniqueIdentifier>{396965d8-6432-4dab-9cc8-ba45d8b4e97c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -55,6 +67,48 @@
     <ClCompile Include="GeneratedFiles\qrc_Intelligence3DMeasurement.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="DXF_RELATIVE\dxfaligneddimitem.cpp">
+      <Filter>Source Files\DXF</Filter>
+    </ClCompile>
+    <ClCompile Include="DXF_RELATIVE\dxfangulardimitem.cpp">
+      <Filter>Source Files\DXF</Filter>
+    </ClCompile>
+    <ClCompile Include="DXF_RELATIVE\dxfellipseitem.cpp">
+      <Filter>Source Files\DXF</Filter>
+    </ClCompile>
+    <ClCompile Include="DXF_RELATIVE\dxfpolylineitem.cpp">
+      <Filter>Source Files\DXF</Filter>
+    </ClCompile>
+    <ClCompile Include="DXF_RELATIVE\dxfradialdimitem.cpp">
+      <Filter>Source Files\DXF</Filter>
+    </ClCompile>
+    <ClCompile Include="DXF_RELATIVE\entitiesparser4dxf.cpp">
+      <Filter>Source Files\DXF</Filter>
+    </ClCompile>
+    <ClCompile Include="DXF_RELATIVE\MarkItem.cpp">
+      <Filter>Source Files\DXF</Filter>
+    </ClCompile>
+    <ClCompile Include="DXF_RELATIVE\PathItem.cpp">
+      <Filter>Source Files\DXF</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_qcustomplot.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_qcustomplot.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_spcwidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_spcwidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="SPC_RELATIVE\qcustomplot.cpp">
+      <Filter>Source Files\SPC</Filter>
+    </ClCompile>
+    <ClCompile Include="SPC_RELATIVE\spcwidget.cpp">
+      <Filter>Source Files\SPC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Intelligence3DMeasurement.h">
@@ -66,10 +120,40 @@
     <CustomBuild Include="Intelligence3DMeasurement.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="SPC_RELATIVE\qcustomplot.h">
+      <Filter>Header Files\SPC</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SPC_RELATIVE\spcwidget.h">
+      <Filter>Header Files\SPC</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_Intelligence3DMeasurement.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DXF_RELATIVE\dxfaligneddimitem.h">
+      <Filter>Header Files\DXF</Filter>
+    </ClInclude>
+    <ClInclude Include="DXF_RELATIVE\dxfangulardimitem.h">
+      <Filter>Header Files\DXF</Filter>
+    </ClInclude>
+    <ClInclude Include="DXF_RELATIVE\dxfellipseitem.h">
+      <Filter>Header Files\DXF</Filter>
+    </ClInclude>
+    <ClInclude Include="DXF_RELATIVE\dxfpolylineitem.h">
+      <Filter>Header Files\DXF</Filter>
+    </ClInclude>
+    <ClInclude Include="DXF_RELATIVE\dxfradialdimitem.h">
+      <Filter>Header Files\DXF</Filter>
+    </ClInclude>
+    <ClInclude Include="DXF_RELATIVE\entitiesparser4dxf.h">
+      <Filter>Header Files\DXF</Filter>
+    </ClInclude>
+    <ClInclude Include="DXF_RELATIVE\MarkItem.h">
+      <Filter>Header Files\DXF</Filter>
+    </ClInclude>
+    <ClInclude Include="DXF_RELATIVE\PathItem.h">
+      <Filter>Header Files\DXF</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
