@@ -3,13 +3,20 @@
 #include <QString>
 #include <QVector>
 #include <QPointF>
+#include <QMap>
 
-#define USING_SIMULATION_MODE true
-#define REPLACE_HALCON_LIB false
+#include "HALCONCpp/HalconCpp.h"
+#include "HALCONCpp/HDevThread.h"
+
+#define ENABLE_VISION_MODULE false
+#define ENABLE_MOTION_MODULE true
 
 #define PROJECT_DIRECTORY "../Projects/"
 #define CAD_DIRECTORY "../CADs/"
 #define REPORT_DIRECTORY "../Reports/"
+
+using namespace HalconCpp;
+
 
 enum MeasureType {
 	L2LD,
@@ -23,30 +30,31 @@ enum MeasureType {
 	STN
 };
 
-/**
- * @brief Camera measurement's item
- */
 struct CAMERAITEM {
-	int type;					///< type of measurement
+	int type;						///< type of measurement
 	QString content;				///< content of measurement
 	QVector<QPointF> ctrlNodes;		///< control points(x-y) of measurement
 	int nHeight;					///< camera height
 	bool bIsInverted;				///< invert flag
-	int nTemp;						///< reserved variable
-	QString ret;					///< result
+	int nTemp = 0;					///< reserved variable
+	double dStandard;
+	double dUpper;
+	double dLower;
+	QString ret;					///< return
+	QString conclusion;
 };
-/**
- * @brief Laser measurement's item
- */
+
 struct LASERITEM {
 	QString content;			///< content of measurement
 	QVector<QPointF> nodes;		///< points(x-y) of measurement
 	int nHeight;				///< laser height
+	double dStandard;
+	double dUpper;
+	double dLower;
 	QString ret;				///< result
+	QString conclusion;
 };
-/**
- * @brief Infomation of mesurement project
- */
+
 struct ProjectInfo {
 	QString projectName;
 	QString cadFile;
@@ -64,6 +72,7 @@ struct ProjectInfo {
 	QPointF startPoint;
 };
 
+
 class Global
 {
 public:
@@ -76,7 +85,9 @@ public:
 	// Laser Offset Coordinate
 	static double g_laserBiasX;
 	static double g_laserBiasY;
+	static double g_laserBiasZ;
 
+	static bool g_isDBConnected;
 	static bool g_isLaserConnected;
 
 	// Data Process Config
@@ -86,5 +97,12 @@ public:
 	static double g_camViewField;
 
 	static ProjectInfo g_projectInfo;
+
+	// Halcon
+	static bool g_enableCamCtrl;
+	static HObject g_image;
+	static HTuple AcqHandle;
+	static HTuple hv_window;
+	static QMap<QString, HObject> halconData;
 };
 

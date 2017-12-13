@@ -148,12 +148,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_NewProjectDlg.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_PhotoLabel.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_PhotoLabel.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_ProcessTypeCfgDlg.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -179,9 +173,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NewProjectDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PhotoLabel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ProcessTypeCfgDlg.cpp">
@@ -277,9 +268,6 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="NewProjectDlg.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="PhotoLabel.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="ProcessTypeCfgDlg.h">

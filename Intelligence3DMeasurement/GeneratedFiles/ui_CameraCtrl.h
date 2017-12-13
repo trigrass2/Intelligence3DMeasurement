@@ -165,8 +165,10 @@ public:
         axis0MaxVel->setAccelerated(true);
         axis0MaxVel->setSuffix(QStringLiteral("p/s"));
         axis0MaxVel->setDecimals(0);
-        axis0MaxVel->setMinimum(4000);
+        axis0MaxVel->setMinimum(500);
         axis0MaxVel->setMaximum(2e+6);
+        axis0MaxVel->setSingleStep(500);
+        axis0MaxVel->setValue(4000);
 
         gridLayout->addWidget(axis0MaxVel, 1, 4, 1, 1);
 
@@ -315,9 +317,10 @@ public:
         axis1MaxVel->setAccelerated(true);
         axis1MaxVel->setSuffix(QStringLiteral("p/s"));
         axis1MaxVel->setDecimals(0);
-        axis1MaxVel->setMinimum(4000);
+        axis1MaxVel->setMinimum(500);
         axis1MaxVel->setMaximum(2e+6);
-        axis1MaxVel->setSingleStep(1);
+        axis1MaxVel->setSingleStep(500);
+        axis1MaxVel->setValue(4000);
 
         gridLayout->addWidget(axis1MaxVel, 2, 4, 1, 1);
 
@@ -329,8 +332,10 @@ public:
         axis2MaxVel->setAccelerated(true);
         axis2MaxVel->setSuffix(QStringLiteral("p/s"));
         axis2MaxVel->setDecimals(0);
-        axis2MaxVel->setMinimum(4000);
+        axis2MaxVel->setMinimum(500);
         axis2MaxVel->setMaximum(2e+6);
+        axis2MaxVel->setSingleStep(500);
+        axis2MaxVel->setValue(4000);
 
         gridLayout->addWidget(axis2MaxVel, 3, 4, 1, 1);
 

@@ -46,6 +46,7 @@ public:
     QHBoxLayout *horizontalLayout;
     QDoubleSpinBox *laserBiasX;
     QDoubleSpinBox *laserBiasY;
+    QDoubleSpinBox *laserBiasZ;
     QLineEdit *nameLineEdit;
 
     void setupUi(QDialog *LaserPortCfgDlg)
@@ -161,6 +162,7 @@ public:
         laserBiasX->setAlignment(Qt::AlignCenter);
         laserBiasX->setAccelerated(true);
         laserBiasX->setDecimals(0);
+        laserBiasX->setMinimum(-100000);
         laserBiasX->setMaximum(100000);
 
         horizontalLayout->addWidget(laserBiasX);
@@ -170,9 +172,19 @@ public:
         laserBiasY->setAlignment(Qt::AlignCenter);
         laserBiasY->setAccelerated(true);
         laserBiasY->setDecimals(0);
+        laserBiasY->setMinimum(-100000);
         laserBiasY->setMaximum(100000);
 
         horizontalLayout->addWidget(laserBiasY);
+
+        laserBiasZ = new QDoubleSpinBox(groupBox);
+        laserBiasZ->setObjectName(QStringLiteral("laserBiasZ"));
+        laserBiasZ->setAccelerated(true);
+        laserBiasZ->setDecimals(0);
+        laserBiasZ->setMinimum(-100000);
+        laserBiasZ->setMaximum(100000);
+
+        horizontalLayout->addWidget(laserBiasZ);
 
 
         gridLayout->addWidget(groupBox, 4, 0, 1, 4);
@@ -241,6 +253,8 @@ public:
         laserBiasX->setSuffix(QApplication::translate("LaserPortCfgDlg", "p", Q_NULLPTR));
         laserBiasY->setPrefix(QApplication::translate("LaserPortCfgDlg", "\316\224Y=", Q_NULLPTR));
         laserBiasY->setSuffix(QApplication::translate("LaserPortCfgDlg", "p", Q_NULLPTR));
+        laserBiasZ->setPrefix(QApplication::translate("LaserPortCfgDlg", "\316\224Z=", Q_NULLPTR));
+        laserBiasZ->setSuffix(QApplication::translate("LaserPortCfgDlg", "p", Q_NULLPTR));
         nameLineEdit->setText(QApplication::translate("LaserPortCfgDlg", "Unaccessible", Q_NULLPTR));
     } // retranslateUi
 

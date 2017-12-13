@@ -38,7 +38,6 @@ private:
 private slots:
 	void ShowMC_triggerd();
 	void ShowLaser_triggered();
-	void StopOnEMG_triggered();
 
 	void RecordingLookUp_triggered();
 	void DatabaseCfg_triggered();

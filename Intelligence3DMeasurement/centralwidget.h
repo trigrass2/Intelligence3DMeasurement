@@ -40,7 +40,7 @@ signals:
 	void LaserRequire2(int index);
 
 private slots:
-	void ShowPhoto(const QPixmap &p);
+	void ShowPhoto();
 	void on_cameraCtrlBtn_clicked();
 
 	void UpdateNodeListTable();
@@ -49,7 +49,6 @@ private slots:
 	void on_replanBtn_clicked();
 	void on_loadBtn_clicked();
 	void on_saveBtn_clicked();
-	void on_stopBtn_clicked();
 	void on_startBtn_clicked();
 
 	void ShowResult();

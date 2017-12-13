@@ -25,10 +25,9 @@ private:
 	QTimer m_updateTimer;
 
 signals:
-	void SendAFrame(const QPixmap&);
+	void ShowAFrame();
 
 private slots:
-	void RealtimeCapture();
 	void StatusDisplay();
 	void SetProfile();
 

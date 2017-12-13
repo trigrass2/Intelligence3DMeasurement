@@ -213,9 +213,9 @@ void DxfPainter::wheelEvent(QWheelEvent * event)
 	m_zoomRatio *= factor;
 }
 /**
- * @brief	Point adsorption
- * @param	nearPoints	Adsorpting points.
- * @param	currentPos	Adsorpted points.
+ * @brief	Point attachment
+ * @param	nearPoints
+ * @param	currentPos
  */
 QPointF DxfPainter::GetNearest(const QList<QPointF> &nearPoints, const QPointF &currentPos)
 {
@@ -233,13 +233,15 @@ QPointF DxfPainter::GetNearest(const QList<QPointF> &nearPoints, const QPointF &
  */
 void DxfPainter::UpdateSqc()
 {
+	// attach beginning point.
 	QList<QPointF> endPoints;
 	Q_FOREACH(QGraphicsItem* it, m_dxfScene->items()) {
 		if (it->type() == DXF_POLY) { endPoints << POLY_PTR_CAST(it)->PolygonF().toList(); }
 	}
 	QPointF begin(GetNearest(endPoints, m_currentCursorPos));
-	Global::g_projectInfo.camSequence.clear();
 
+	// connnect
+	Global::g_projectInfo.camSequence.clear();
 	QList<CAMERAITEM> items(Global::g_projectInfo.camearItems.toList());
 	QPointF previousNode(begin);
 	int n = items.count();
@@ -248,7 +250,8 @@ void DxfPainter::UpdateSqc()
 		double min = INT_MAX;
 		bool isInverted = false;
 		for (int i = 0; i < items.count(); ++i) {
-			if ((items.at(i).nTemp != 1) && (items.at(i).nHeight != 1)) {
+			qDebug() << "item->"<<items.at(i).nTemp <<"//"<< items.at(i).nHeight;
+			if (items.at(i).nTemp != 1) {
 				double d0 = P_DISTANCE(previousNode, items.at(i).ctrlNodes.first());
 				double d1 = P_DISTANCE(previousNode, items.at(i).ctrlNodes.last());
 				if ((d0 < d1) && (d0 < min)) {
@@ -261,11 +264,16 @@ void DxfPainter::UpdateSqc()
 					index = i;
 					isInverted = true;
 				}
+				if ((d0 == d1) && (d0 < min)) {
+					min = d0;
+					index = i;
+					isInverted = false;
+				}
 			}
 		}
 		if (isInverted) { previousNode = items.at(index).ctrlNodes.first(); }
 		else{ previousNode = items.at(index).ctrlNodes.last(); }
-		items[index].nTemp = 1;
+		items[index].nTemp = 1;		// processed
 		Global::g_projectInfo.camSequence.append(index);
 		Global::g_projectInfo.camearItems[index].bIsInverted = isInverted;
 	}
@@ -774,6 +782,7 @@ void DxfPainter::SampleOfRadius()
 			c2.setY(ellipse->pos().y() + ellipse->SALength() *
 				qSin(qDegreesToRadians(ellipse->EndAngle())));
 		}
+		isBig = true;
 	}
 	ellipse->SetProcessed();
 
@@ -827,6 +836,7 @@ void DxfPainter::SampleOfArcAngle()
 			c2.setY(ellipse->pos().y() + ellipse->SALength() *
 				qSin(qDegreesToRadians(ellipse->EndAngle())));
 		}
+		isBig = true;
 	}
 	ellipse->SetProcessed();
 
@@ -846,6 +856,54 @@ void DxfPainter::SampleOfArcAngle()
  */
 void DxfPainter::SampleOfCircular()
 {
+	DXFEllipseItem *ellipse = ELLIPSE_PTR_CAST(m_dxfScene->selectedItems().first());
+
+	if ((ellipse->LALength() != ellipse->SALength())) { return; }
+	QPointF c0, c1, c2;
+	bool isBig;
+
+	if (2 * ellipse->LALength() <= Global::g_camViewField) {
+		c0.setX(ellipse->pos().x());
+		c0.setY(ellipse->pos().y());
+		isBig = false;
+	}
+	else {
+		if (ellipse->SpanAngle() >= 360.0) {	// closed circle
+			c0.setX(ellipse->pos().x());
+			c0.setY(ellipse->pos().y() - ellipse->SALength());
+			c1.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(30.0)));
+			c1.setY(ellipse->pos().y() + ellipse->SALength() / 2);
+			c2.setX(ellipse->pos().x() - ellipse->LALength() * qCos(qDegreesToRadians(30.0)));
+			c2.setY(c1.y());
+		}
+		else {		// open arc
+			c0.setX(ellipse->pos().x() + ellipse->LALength() *
+				qCos(qDegreesToRadians(ellipse->StartAngle())));
+			c0.setY(ellipse->pos().y() + ellipse->SALength() *
+				qSin(qDegreesToRadians(ellipse->StartAngle())));
+			c1.setX(ellipse->pos().x() + ellipse->LALength() *
+				qCos(qDegreesToRadians(ellipse->StartAngle() + ellipse->SpanAngle() / 2)));
+			c1.setY(ellipse->pos().y() + ellipse->SALength() *
+				qSin(qDegreesToRadians(ellipse->StartAngle() + ellipse->SpanAngle() / 2)));
+			c2.setX(ellipse->pos().x() + ellipse->LALength() *
+				qCos(qDegreesToRadians(ellipse->EndAngle())));
+			c2.setY(ellipse->pos().y() + ellipse->SALength() *
+				qSin(qDegreesToRadians(ellipse->EndAngle())));
+		}
+		isBig = true;
+	}
+	ellipse->SetProcessed();
+
+	CAMERAITEM ellipseItem;
+	if (isBig) { ellipseItem.ctrlNodes << c0 << c1 << c2; }
+	else { ellipseItem.ctrlNodes << c0; }
+
+	ellipseItem.type = MeasureType::CIC;
+	ellipseItem.content = "Circular";
+	ellipseItem.nHeight = 0;
+	Global::g_projectInfo.camearItems.append(ellipseItem);
+
+	emit NodeListTableUpdate();
 }
 /**
  * @brief	Line length

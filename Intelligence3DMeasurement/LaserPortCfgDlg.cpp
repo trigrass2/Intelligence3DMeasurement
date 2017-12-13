@@ -13,7 +13,7 @@ LaserPortCfgDlg::LaserPortCfgDlg(QWidget *parent)
 	ui.setupUi(this);
 
 	// *³õÊ¼»¯ÅäÖÃ±í -BEGIN
-	m_config.nPortName = 0;
+	m_config.nPortName = 6;
 	m_config.nBaudRate = 0;
 	m_config.nDataBits = 0;
 	m_config.nParity = 0;
@@ -25,10 +25,12 @@ LaserPortCfgDlg::LaserPortCfgDlg(QWidget *parent)
 		QSettings cfgFile("./config.ini", QSettings::IniFormat);
 		Global::g_laserBiasX = cfgFile.value("/LASER/Bias_X").toDouble();
 		Global::g_laserBiasY = cfgFile.value("/LASER/Bias_Y").toDouble();
+		Global::g_laserBiasZ = cfgFile.value("/LASER/Bias_Z").toDouble();
 	}
 	else {
 		Global::g_laserBiasX = 0;
 		Global::g_laserBiasY = 0;
+		Global::g_laserBiasZ = 0;
 	}
 	// -END
 
@@ -38,9 +40,11 @@ LaserPortCfgDlg::LaserPortCfgDlg(QWidget *parent)
 	ui.stopBitsComboBox->setCurrentIndex(m_config.nStopBits);
 	ui.laserBiasX->setValue(Global::g_laserBiasX);
 	ui.laserBiasY->setValue(Global::g_laserBiasY);
+	ui.laserBiasZ->setValue(Global::g_laserBiasZ);
 
 	connect(ui.laserBiasX, SIGNAL(valueChanged(double)), SLOT(SyncMem()));
 	connect(ui.laserBiasY, SIGNAL(valueChanged(double)), SLOT(SyncMem()));
+	connect(ui.laserBiasZ, SIGNAL(valueChanged(double)), SLOT(SyncMem()));
 
 	ApplyConfig();
 }
@@ -56,6 +60,7 @@ void LaserPortCfgDlg::closeEvent(QCloseEvent * e)
 	QSettings cfgFile("./config.ini", QSettings::IniFormat);
 	cfgFile.setValue("/LASER/Bias_X", Global::g_laserBiasX);
 	cfgFile.setValue("/LASER/Bias_Y", Global::g_laserBiasY);
+	cfgFile.setValue("/LASER/Bias_Z", Global::g_laserBiasZ);
 }
 
 void LaserPortCfgDlg::ApplyConfig()
@@ -147,6 +152,7 @@ void LaserPortCfgDlg::SyncMem()
 {
 	Global::g_laserBiasX = ui.laserBiasX->value();
 	Global::g_laserBiasY = ui.laserBiasY->value();
+	Global::g_laserBiasZ = ui.laserBiasZ->value();
 }
 
 void LaserPortCfgDlg::GetData()

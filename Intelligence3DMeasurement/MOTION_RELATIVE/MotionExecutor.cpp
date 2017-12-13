@@ -1,18 +1,21 @@
 #include <QApplication>
 #include <QDebug>
+#include <Windows.h>
 #include "MotionExecutor.h"
 
 #include "LTDMC.h"
 #include "Global.h"
 
 
-/**
- * @brief	修正激光采样坐标误差
- */
-void MotionExecutor::ErrorCorrection(double &dx, double &dy)
+void MotionExecutor::BiasCorrectionXY(double &dx, double &dy)
 {
 	dx += Global::g_pulseEquivalent * Global::g_laserBiasX;
 	dy += Global::g_pulseEquivalent * Global::g_laserBiasY;
+}
+
+void MotionExecutor::BiasCorrectionZ(double &dz)
+{
+	dz += Global::g_pulseEquivalent * Global::g_laserBiasZ;
 }
 /**
  * @brief	Coordinator
@@ -23,78 +26,172 @@ void MotionExecutor::Coordinator(double dx, double dy, double dz, double &lastHe
 {
 	long pdx, pdy, pdz;
 	if (dz - lastHeight > 0) {
-		qDebug() << "[Height adjusting to " << dz << "]";
+		qDebug() << "	[Height]Adjusting to " << dz;
 		pdz = dz / Global::g_pulseEquivalent;
-		if (!USING_SIMULATION_MODE) {
+		if (ENABLE_MOTION_MODULE) {
 			dmc_pmove(0, 2, pdz, 1);
-			while (dmc_check_done(0, 2) == 0) { qApp->processEvents(); }
+			while (dmc_check_done(0, 2) == 0) {
+				if (m_break) {
+					dmc_emg_stop(0);
+					return;
+				}
+				qApp->processEvents();
+			}
+			qDebug() << "	->Done.";
 		}
 
-		qDebug() << "X-Y moving to " << "(" << dx << ", " << dy << ")";
+		qDebug() << "	[XY]Moving to " << "(" << dx << ", " << dy << ")";
 		pdx = dx / Global::g_pulseEquivalent;
 		pdy = dy / Global::g_pulseEquivalent;
-		if (!USING_SIMULATION_MODE) {
+		if (ENABLE_MOTION_MODULE) {
 			dmc_line_multicoor(0, 0, 2, new ushort[2]{ 0,1 }, new long[2]{ pdx, pdy }, 1);
-			while (dmc_check_done_multicoor(0, 0) == 0) { qApp->processEvents(); }
+			while (dmc_check_done_multicoor(0, 0) == 0) {
+				if (m_break) {
+					dmc_emg_stop(0);
+					return;
+				}
+				qApp->processEvents();
+			}
+			qDebug() << "	->Done.";
 		}
 	}
 	else if(dz - lastHeight < 0) {
-		qDebug() << "X-Y moving to " << "(" << dx << ", " << dy << ")";
+		qDebug() << "	[XY]Moving to " << "(" << dx << ", " << dy << ")";
 		pdx = dx / Global::g_pulseEquivalent;
 		pdy = dy / Global::g_pulseEquivalent;
-		if (!USING_SIMULATION_MODE) {
+		if (ENABLE_MOTION_MODULE) {
 			dmc_line_multicoor(0, 0, 2, new ushort[2]{ 0,1 }, new long[2]{ pdx, pdy }, 1);
-			while (dmc_check_done_multicoor(0, 0) == 0) { qApp->processEvents(); }
+			while (dmc_check_done_multicoor(0, 0) == 0) {
+				if (m_break) {
+					dmc_emg_stop(0);
+					return;
+				}
+				qApp->processEvents();
+			}
+			qDebug() << "	->Done.";
 		}
 
-		qDebug() << "[Height adjusting to " << dz << "]";
+		qDebug() << "	[Height]Adjusting to " << dz;
 		pdz = dz / Global::g_pulseEquivalent;
-		if (!USING_SIMULATION_MODE) {
+		if (ENABLE_MOTION_MODULE) {
 			dmc_pmove(0, 2, pdz, 1);
-			while (dmc_check_done(0, 2) == 0) { qApp->processEvents(); }
+			while (dmc_check_done(0, 2) == 0) {
+				if (m_break) {
+					dmc_emg_stop(0);
+					return;
+				}
+				qApp->processEvents();
+			}
+			qDebug() << "	->Done.";
 		}
 	}
 	else {
-		qDebug() << "X-Y moving to " << "(" << dx << ", " << dy << ")";
+		qDebug() << "	[XY]Moving to " << "(" << dx << ", " << dy << ")";
 		pdx = dx / Global::g_pulseEquivalent;
 		pdy = dy / Global::g_pulseEquivalent;
-		if (!USING_SIMULATION_MODE) {
+		if (ENABLE_MOTION_MODULE) {
 			dmc_line_multicoor(0, 0, 2, new ushort[2]{ 0,1 }, new long[2]{ pdx, pdy }, 1);
-			while (dmc_check_done_multicoor(0, 0) == 0) { qApp->processEvents(); }
+			while (dmc_check_done_multicoor(0, 0) == 0) {
+				if (m_break) {
+					dmc_emg_stop(0);
+					return;
+				}
+				qApp->processEvents();
+			}
+			qDebug() << "	->Done.";
 		}
 	}
 	lastHeight = dz;
 }
 
-bool MotionExecutor::Camera(double x, double y, int itemIndex)
+void MotionExecutor::Camera(double x, double y, int itemIndex)
 {
-	qDebug() << "	Camera: capturing@item[" << itemIndex << "]";
-	if (!USING_SIMULATION_MODE) {
-		// 保存图片
-		return true;
+	qDebug() << "	[Camera]capturing@item(" << itemIndex << ")";
+	if (ENABLE_VISION_MODULE) {
+		Sleep(100);		// wait for tatally stop
+
+		GrabImage(&Global::g_image, Global::AcqHandle);
+		emit ShowCurrent();
+
+		QString key = QString::number(itemIndex) + "_" + QString::number(x) + "_" + QString::number(y);
+		Global::halconData.insert(key, Global::g_image);
+		qDebug() << "	->Done.";
 	}
-	return false;
+}
+
+void MotionExecutor::ReturnControl(bool f)
+{
+	if (f) {
+		if (ENABLE_MOTION_MODULE) {
+			dmc_set_position(0, 0, 0);
+			dmc_set_position(0, 1, 0);
+			dmc_set_position(0, 2, 0);
+		}
+		qDebug() << "Setup relative ORG.";
+	}
+	else {
+		qDebug() << "Returning to relative ORG.";
+		if (ENABLE_MOTION_MODULE) {
+			// Z轴回原
+			dmc_home_move(0, 2);
+			Sleep(100);
+			while (dmc_check_done(0, 2) == 0) {
+				if (m_break) {
+					dmc_emg_stop(0);
+					return;
+				}
+				qApp->processEvents();
+			}
+			// X、Y轴复位
+			dmc_pmove(0, 0, 0, 1);
+			dmc_pmove(0, 1, 0, 1);
+			while (dmc_check_done(0, 0) == 0) {
+				if (m_break) {
+					dmc_emg_stop(0);
+					return;
+				}
+				qApp->processEvents();
+			}
+			while (dmc_check_done(0, 1) == 0) {
+				if (m_break) {
+					dmc_emg_stop(0);
+					return;
+				}
+				qApp->processEvents();
+			}
+			// Z轴复位
+			dmc_pmove(0, 2, 0, 1);
+			while (dmc_check_done(0, 2) == 0) {
+				if (m_break) {
+					dmc_emg_stop(0);
+					return;
+				}
+				qApp->processEvents();
+			}
+			qDebug() << "Done.";
+		}
+		m_break = false;
+	}
 }
 
 void MotionExecutor::run()
 {
-	qDebug() << "Starting...setup relative ORG.";
-	if (!USING_SIMULATION_MODE) {
-		dmc_set_position(0, 0, 0);
-		dmc_set_position(0, 1, 0);
-		dmc_set_position(0, 2, 0);
+	qDebug() << "#######Start#######";
+
+	if (ENABLE_MOTION_MODULE) {
+		dmc_set_vector_profile_multicoor(0, 0, 0, Global::g_xyLineVectorVel, 0.01, 0.01);
+		dmc_set_profile(0, 0, 0, Global::g_zVel, 0.01, 0.01, 0);
+		dmc_set_profile(0, 1, 0, Global::g_zVel, 0.01, 0.01, 0);
+		dmc_set_profile(0, 2, 0, Global::g_zVel, 0.01, 0.01, 0);
 	}
+
+	ReturnControl(!m_break);
 
 	double x0 = Global::g_projectInfo.startPoint.x();
 	double y0 = Global::g_projectInfo.startPoint.y();
 	double height = 0;
 
-	if (!USING_SIMULATION_MODE) {
-		dmc_set_vector_profile_multicoor(0, 0, 0, Global::g_xyLineVectorVel, 0.01);
-		dmc_set_profile(0, 2, 0, Global::g_zVel, 0.01, 0, 0);
-	}
-
-	qDebug() << "Move to camera area.";
+	qDebug() << "Enter camera area.";
 	Q_FOREACH(int sqc, Global::g_projectInfo.camSequence) {
 		double dx, dy, dz;
 		if (Global::g_projectInfo.camearItems[sqc].bIsInverted) {
@@ -103,8 +200,7 @@ void MotionExecutor::run()
 				dx = Global::g_projectInfo.camearItems[sqc].ctrlNodes[i].x() - x0;
 				dy = Global::g_projectInfo.camearItems[sqc].ctrlNodes[i].y() - y0;
 				Coordinator(dx, dy, dz, height);
-				if (Camera(dx, dy, sqc)) { qDebug() << "	->done."; }
-				else { qDebug() << "	->failed!"; }
+				Camera(dx, dy, sqc);
 			}
 			Global::g_projectInfo.camearItems[sqc].nTemp = 9999;	// 完成标识
 		}
@@ -114,34 +210,25 @@ void MotionExecutor::run()
 				dy = Global::g_projectInfo.camearItems[sqc].ctrlNodes[i].y() - y0;
 				dz = Global::g_projectInfo.camearItems[sqc].nHeight;
 				Coordinator(dx, dy, dz, height);
-				if (Camera(dx, dy, sqc)) { qDebug() << "	->done."; }
-				else { qDebug() << "	->failed!"; }
+				Camera(dx, dy, sqc);
 			}
 			Global::g_projectInfo.camearItems[sqc].nTemp = 9999;
 		}
 	}
 
-	qDebug() << "Move to laser area.";
+	qDebug() << "Enter laser area.";
 	for (int index = 0; index < Global::g_projectInfo.laserItems.count(); ++index) {
 		double dx, dy, dz = Global::g_projectInfo.laserItems[index].nHeight;
+		BiasCorrectionZ(dz);
 		for (int i = 0; i < Global::g_projectInfo.laserItems[index].nodes.count(); ++i) {
 			dx = Global::g_projectInfo.laserItems[index].nodes[i].x() - x0;
 			dy = Global::g_projectInfo.laserItems[index].nodes[i].y() - y0;
-			ErrorCorrection(dx, dy);
+			BiasCorrectionXY(dx, dy);
 			Coordinator(dx, dy, dz, height);
 			emit LaserRequire(index);
 		}
 	}
 
-	qDebug() << "Return to relative ORG.";
-	if (!USING_SIMULATION_MODE) {
-		dmc_home_move(0, 2);
-		while (dmc_check_done(0, 2) == 0) { qApp->processEvents(); }	// Z轴先复位
-		dmc_pmove(0, 0, 0, 1);
-		dmc_pmove(0, 1, 0, 1);
-		while (dmc_check_done(0, 0) == 0) { qApp->processEvents(); }
-		while (dmc_check_done(0, 1) == 0) { qApp->processEvents(); }
-		dmc_pmove(0, 2, 0, 1);
-		while (dmc_check_done(0, 2) == 0) { qApp->processEvents(); }
-	}
+	if (!m_break){ ReturnControl(false); }
+	qDebug() << "#######Finish#######";
 }

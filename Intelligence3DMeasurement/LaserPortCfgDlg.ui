@@ -284,6 +284,9 @@
         <property name="decimals">
          <number>0</number>
         </property>
+        <property name="minimum">
+         <double>-100000.000000000000000</double>
+        </property>
         <property name="maximum">
          <double>100000.000000000000000</double>
         </property>
@@ -305,6 +308,31 @@
         </property>
         <property name="decimals">
          <number>0</number>
+        </property>
+        <property name="minimum">
+         <double>-100000.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100000.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="laserBiasZ">
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="prefix">
+         <string>ΔZ=</string>
+        </property>
+        <property name="suffix">
+         <string>p</string>
+        </property>
+        <property name="decimals">
+         <number>0</number>
+        </property>
+        <property name="minimum">
+         <double>-100000.000000000000000</double>
         </property>
         <property name="maximum">
          <double>100000.000000000000000</double>

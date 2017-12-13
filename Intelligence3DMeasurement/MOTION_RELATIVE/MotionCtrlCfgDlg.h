@@ -74,8 +74,6 @@ public:
 	MotionCtrlCfgDlg(QWidget *parent = Q_NULLPTR);
 	~MotionCtrlCfgDlg();
 
-	void EmergencyStop();
-
 protected:
 	void closeEvent(QCloseEvent *e) Q_DECL_OVERRIDE;
 

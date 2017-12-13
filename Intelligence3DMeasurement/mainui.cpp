@@ -41,7 +41,6 @@ void MainUI::LoadMenu()
 	m_deviceMgr = new QMenu("设备管理");
 	m_deviceMgr->addAction("运动控制卡", this, &MainUI::ShowMC_triggerd, tr("Ctrl+M"));
 	m_deviceMgr->addAction("激光传感器", this, &MainUI::ShowLaser_triggered, tr("Ctrl+L"));
-	m_deviceMgr->addAction("紧急停止", this, &MainUI::StopOnEMG_triggered, tr("Ctrl+E"));
 
 	m_infoMgr = new QMenu("信息管理");
 	m_infoMgr->addAction("记录查询", this, &MainUI::RecordingLookUp_triggered, tr("Ctrl+R"));
@@ -66,11 +65,6 @@ void MainUI::ShowMC_triggerd()
 void MainUI::ShowLaser_triggered()
 {
 	m_laserModule->show();
-}
-
-void MainUI::StopOnEMG_triggered()
-{
-	m_motionModule->EmergencyStop();
 }
 
 void MainUI::RecordingLookUp_triggered()

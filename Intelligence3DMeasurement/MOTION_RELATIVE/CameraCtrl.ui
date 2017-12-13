@@ -211,10 +211,16 @@
         <number>0</number>
        </property>
        <property name="minimum">
-        <double>4000.000000000000000</double>
+        <double>500.000000000000000</double>
        </property>
        <property name="maximum">
         <double>2000000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>500.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>4000.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -626,13 +632,16 @@
         <number>0</number>
        </property>
        <property name="minimum">
-        <double>4000.000000000000000</double>
+        <double>500.000000000000000</double>
        </property>
        <property name="maximum">
         <double>2000000.000000000000000</double>
        </property>
        <property name="singleStep">
-        <double>1.000000000000000</double>
+        <double>500.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>4000.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -663,10 +672,16 @@
         <number>0</number>
        </property>
        <property name="minimum">
-        <double>4000.000000000000000</double>
+        <double>500.000000000000000</double>
        </property>
        <property name="maximum">
         <double>2000000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>500.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>4000.000000000000000</double>
        </property>
       </widget>
      </item>

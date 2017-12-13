@@ -16,12 +16,12 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include "dxfpainter.h"
-#include "photolabel.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -38,7 +38,7 @@ public:
     QPushButton *stopBtn;
     QPushButton *startBtn;
     QVBoxLayout *rightVLayout;
-    PhotoLabel *curPhotoViewer;
+    QLabel *curPhotoViewer;
     QPushButton *cameraCtrlBtn;
     QTableView *projectItemsView;
 
@@ -46,11 +46,12 @@ public:
     {
         if (CentralWidget->objectName().isEmpty())
             CentralWidget->setObjectName(QStringLiteral("CentralWidget"));
-        CentralWidget->resize(1231, 703);
+        CentralWidget->resize(1323, 703);
         gridLayout = new QGridLayout(CentralWidget);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        gridLayout->setContentsMargins(7, 7, 7, 7);
         graphicViewer = new DxfPainter(CentralWidget);
         graphicViewer->setObjectName(QStringLiteral("graphicViewer"));
         graphicViewer->setMinimumSize(QSize(600, 600));
@@ -96,9 +97,9 @@ public:
         rightVLayout = new QVBoxLayout();
         rightVLayout->setSpacing(6);
         rightVLayout->setObjectName(QStringLiteral("rightVLayout"));
-        curPhotoViewer = new PhotoLabel(CentralWidget);
+        curPhotoViewer = new QLabel(CentralWidget);
         curPhotoViewer->setObjectName(QStringLiteral("curPhotoViewer"));
-        curPhotoViewer->setMinimumSize(QSize(600, 400));
+        curPhotoViewer->setMinimumSize(QSize(700, 400));
         curPhotoViewer->setMaximumSize(QSize(700, 400));
         curPhotoViewer->setScaledContents(false);
         curPhotoViewer->setAlignment(Qt::AlignCenter);
@@ -112,7 +113,7 @@ public:
 
         projectItemsView = new QTableView(CentralWidget);
         projectItemsView->setObjectName(QStringLiteral("projectItemsView"));
-        projectItemsView->setMinimumSize(QSize(600, 200));
+        projectItemsView->setMinimumSize(QSize(700, 200));
         projectItemsView->setMaximumSize(QSize(700, 9999));
 
         rightVLayout->addWidget(projectItemsView);
