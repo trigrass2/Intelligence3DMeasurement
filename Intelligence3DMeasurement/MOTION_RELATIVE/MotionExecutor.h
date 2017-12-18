@@ -13,7 +13,7 @@ private:
 	void BiasCorrectionXY(double &dx, double &dy);
 	void BiasCorrectionZ(double &dz);
 	void Coordinator(double dx, double dy, double dz, double &lastHeight);
-	void Camera(double x, double y, int itemIndex);
+	void Camera(int itemIndex);
 	void ReturnControl(bool f);
 
 protected:

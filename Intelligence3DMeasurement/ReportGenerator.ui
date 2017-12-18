@@ -35,6 +35,45 @@
    <enum>Qt::LeftToRight</enum>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="4">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>300</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0" colspan="5">
+    <widget class="QTextEdit" name="reportArea">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>300</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="1" column="2">
     <widget class="QPushButton" name="saveBtn">
      <property name="sizePolicy">
@@ -64,40 +103,11 @@
     </widget>
    </item>
    <item row="1" column="3">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+    <widget class="QCheckBox" name="syncSQL">
+     <property name="text">
+      <string>存入数据库</string>
      </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Expanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>300</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="0">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Expanding</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>300</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="0" colspan="4">
-    <widget class="QTextEdit" name="reportArea">
-     <property name="readOnly">
+     <property name="checked">
       <bool>true</bool>
      </property>
     </widget>

@@ -31,11 +31,11 @@ CentralWidget::CentralWidget(QWidget *parent)
 	visionModule = new Vision;
 	connect(visionModule, SIGNAL(ProcessDone()), this, SLOT(ShowResult()));
 
-#if ENABLE_VISION_MODULE
-	// Display window initial
-	OpenWindow(0, 0, 700, 400, (Hlong)ui.curPhotoViewer->winId(), "", "", &Global::hv_window);
-	SetPart(Global::hv_window, 0, 0, 1944, 2592);
-#endif // ENABLE_VISION_MODULE
+	if (ENABLE_VISION_MODULE) {
+		// Display window initial
+		OpenWindow(0, 0, 700, 400, (Hlong)ui.curPhotoViewer->winId(), "", "", &Global::hv_window);
+		SetPart(Global::hv_window, 0, 0, 1944, 2592);
+	}
 
 	executor = new MotionExecutor;
 	connect(executor, SIGNAL(finished()), visionModule, SLOT(ImgProc()));
@@ -61,9 +61,11 @@ CentralWidget::~CentralWidget()
 
 void CentralWidget::ShowPhoto()
 {
-	if (Global::g_enableCamCtrl) { GrabImage(&Global::g_image, Global::AcqHandle); }
-	DispObj(Global::g_image, Global::hv_window);
-	DispCross(Global::hv_window, 972, 1296, 500, 0);
+	if (ENABLE_VISION_MODULE) {
+		if (Global::g_enableCamCtrl) { GrabImage(&Global::g_image, Global::AcqHandle); }
+		DispObj(Global::g_image, Global::hv_window);
+		DispCross(Global::hv_window, 972, 1296, 500, 0);
+	}
 }
 
 void CentralWidget::on_cameraCtrlBtn_clicked()
@@ -75,7 +77,8 @@ void CentralWidget::UpdateNodeListTable()
 {
 	projectItemsModel->removeRows(0, projectItemsModel->rowCount());
 	for (int i = 0; i<Global::g_projectInfo.camearItems.count(); ++i) {
-		projectItemsModel->setItem(i, 0, new QStandardItem(Global::g_projectInfo.camearItems.at(i).content));
+		projectItemsModel->setItem(i, 0, new QStandardItem(
+			Global::g_projectInfo.camearItems.at(i).content));
 		projectItemsModel->setItem(i, 1, new QStandardItem(QString::number(
 			Global::g_projectInfo.camearItems.at(i).nHeight)));
 		projectItemsModel->setItem(i, 2, new QStandardItem(QString::number(
@@ -88,7 +91,8 @@ void CentralWidget::UpdateNodeListTable()
 
 	int bias = projectItemsModel->rowCount();
 	for (int i = 0; i<Global::g_projectInfo.laserItems.count(); ++i) {
-		projectItemsModel->setItem(i + bias, 0, new QStandardItem(Global::g_projectInfo.laserItems.at(i).content));
+		projectItemsModel->setItem(i + bias, 0, new QStandardItem(
+			Global::g_projectInfo.laserItems.at(i).content));
 		projectItemsModel->setItem(i + bias, 1, new QStandardItem(QString::number(
 			Global::g_projectInfo.laserItems.at(i).nHeight)));
 		projectItemsModel->setItem(i + bias, 2, new QStandardItem(QString::number(
@@ -278,7 +282,7 @@ void CentralWidget::on_startBtn_clicked()
 void CentralWidget::ShowResult()
 {
 	Global::g_enableCamCtrl = true;
-	Global::g_projectInfo.mesurementDate = QDateTime::currentDateTime().toString("yyyy-MM-dd HHmmss");
+	Global::g_projectInfo.mesurementDate = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 	reporter->RefreshData();
 	reporter->exec();
 }

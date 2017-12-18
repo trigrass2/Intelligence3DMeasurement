@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
@@ -26,10 +27,11 @@ class Ui_ReportGenerator
 {
 public:
     QGridLayout *gridLayout;
-    QPushButton *saveBtn;
     QSpacerItem *horizontalSpacer_2;
-    QSpacerItem *horizontalSpacer;
     QTextEdit *reportArea;
+    QSpacerItem *horizontalSpacer;
+    QPushButton *saveBtn;
+    QCheckBox *syncSQL;
 
     void setupUi(QDialog *ReportGenerator)
     {
@@ -48,6 +50,20 @@ public:
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        horizontalSpacer_2 = new QSpacerItem(300, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_2, 1, 4, 1, 1);
+
+        reportArea = new QTextEdit(ReportGenerator);
+        reportArea->setObjectName(QStringLiteral("reportArea"));
+        reportArea->setReadOnly(true);
+
+        gridLayout->addWidget(reportArea, 0, 0, 1, 5);
+
+        horizontalSpacer = new QSpacerItem(300, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer, 1, 0, 1, 1);
+
         saveBtn = new QPushButton(ReportGenerator);
         saveBtn->setObjectName(QStringLiteral("saveBtn"));
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -61,19 +77,11 @@ public:
 
         gridLayout->addWidget(saveBtn, 1, 2, 1, 1);
 
-        horizontalSpacer_2 = new QSpacerItem(300, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        syncSQL = new QCheckBox(ReportGenerator);
+        syncSQL->setObjectName(QStringLiteral("syncSQL"));
+        syncSQL->setChecked(true);
 
-        gridLayout->addItem(horizontalSpacer_2, 1, 3, 1, 1);
-
-        horizontalSpacer = new QSpacerItem(300, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        gridLayout->addItem(horizontalSpacer, 1, 0, 1, 1);
-
-        reportArea = new QTextEdit(ReportGenerator);
-        reportArea->setObjectName(QStringLiteral("reportArea"));
-        reportArea->setReadOnly(true);
-
-        gridLayout->addWidget(reportArea, 0, 0, 1, 4);
+        gridLayout->addWidget(syncSQL, 1, 3, 1, 1);
 
 
         retranslateUi(ReportGenerator);
@@ -85,6 +93,7 @@ public:
     {
         ReportGenerator->setWindowTitle(QApplication::translate("ReportGenerator", "\346\212\245\350\241\250\351\242\204\350\247\210", Q_NULLPTR));
         saveBtn->setText(QApplication::translate("ReportGenerator", "\344\277\235 \345\255\230", Q_NULLPTR));
+        syncSQL->setText(QApplication::translate("ReportGenerator", "\345\255\230\345\205\245\346\225\260\346\215\256\345\272\223", Q_NULLPTR));
     } // retranslateUi
 
 };

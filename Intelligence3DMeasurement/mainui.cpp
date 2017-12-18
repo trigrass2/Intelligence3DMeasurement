@@ -69,8 +69,8 @@ void MainUI::ShowLaser_triggered()
 
 void MainUI::RecordingLookUp_triggered()
 {
-	DatabaseBrowser *dbBrowser = new DatabaseBrowser(this);
-	dbBrowser->show();
+	DatabaseBrowser dbBrowser(this);
+	dbBrowser.exec();
 }
 
 void MainUI::DatabaseCfg_triggered()

@@ -74,6 +74,9 @@
     <Filter Include="Source Files\VISION">
       <UniqueIdentifier>{0f86a02d-0edb-4715-9cac-8f12fd48092f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Form Files\SPC">
+      <UniqueIdentifier>{90c20e4c-481d-4b66-b86b-b33f9d9c27d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -244,6 +247,24 @@
     <ClCompile Include="mainui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DataRangeSelector.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DataRangeSelector.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="SPC_RELATIVE\DataRangeSelector.cpp">
+      <Filter>Source Files\SPC</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_SPCPlots.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_SPCPlots.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="SPC_RELATIVE\SPCPlots.cpp">
+      <Filter>Source Files\SPC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Intelligence3DMeasurement.ui">
@@ -327,6 +348,18 @@
     <CustomBuild Include="mainui.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="SPC_RELATIVE\DataRangeSelector.ui">
+      <Filter>Form Files\SPC</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SPC_RELATIVE\DataRangeSelector.h">
+      <Filter>Header Files\SPC</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SPC_RELATIVE\SPCPlots.ui">
+      <Filter>Form Files\SPC</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SPC_RELATIVE\SPCPlots.h">
+      <Filter>Header Files\SPC</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_Intelligence3DMeasurement.h">
@@ -387,6 +420,12 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_mainui.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_DataRangeSelector.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_SPCPlots.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

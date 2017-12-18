@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SPCPlots</class>
+ <widget class="QDialog" name="SPCPlots">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>965</width>
+    <height>725</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SPCPlots</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>5</number>
+   </property>
+   <property name="topMargin">
+    <number>5</number>
+   </property>
+   <property name="rightMargin">
+    <number>5</number>
+   </property>
+   <property name="bottomMargin">
+    <number>5</number>
+   </property>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="tabPosition">
+      <enum>QTabWidget::South</enum>
+     </property>
+     <property name="tabShape">
+      <enum>QTabWidget::Triangular</enum>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab0">
+      <attribute name="title">
+       <string>Xbar-R</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>5</number>
+       </property>
+       <property name="leftMargin">
+        <number>5</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <property name="bottomMargin">
+        <number>5</number>
+       </property>
+       <item>
+        <widget class="QCustomPlot" name="plotW0_x" native="true"/>
+       </item>
+       <item>
+        <widget class="QCustomPlot" name="plotW0_r" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab1">
+      <attribute name="title">
+       <string>Xbar-S</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="spacing">
+        <number>5</number>
+       </property>
+       <property name="leftMargin">
+        <number>5</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <property name="bottomMargin">
+        <number>5</number>
+       </property>
+       <item>
+        <widget class="QCustomPlot" name="plotW1_x" native="true"/>
+       </item>
+       <item>
+        <widget class="QCustomPlot" name="plotW1_s" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab2">
+      <attribute name="title">
+       <string>Xmed-R</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="spacing">
+        <number>5</number>
+       </property>
+       <property name="leftMargin">
+        <number>5</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <property name="bottomMargin">
+        <number>5</number>
+       </property>
+       <item>
+        <widget class="QCustomPlot" name="plotW2_xmd" native="true"/>
+       </item>
+       <item>
+        <widget class="QCustomPlot" name="plotW2_r" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab3">
+      <attribute name="title">
+       <string>X-Rs</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="spacing">
+        <number>5</number>
+       </property>
+       <property name="leftMargin">
+        <number>5</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <property name="bottomMargin">
+        <number>5</number>
+       </property>
+       <item>
+        <widget class="QCustomPlot" name="plotW3_x" native="true"/>
+       </item>
+       <item>
+        <widget class="QCustomPlot" name="plotW3_rs" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

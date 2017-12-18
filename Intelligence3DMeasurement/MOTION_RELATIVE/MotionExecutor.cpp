@@ -104,18 +104,22 @@ void MotionExecutor::Coordinator(double dx, double dy, double dz, double &lastHe
 	lastHeight = dz;
 }
 
-void MotionExecutor::Camera(double x, double y, int itemIndex)
+void MotionExecutor::Camera(int itemIndex)
 {
 	qDebug() << "	[Camera]capturing@item(" << itemIndex << ")";
-	if (ENABLE_VISION_MODULE) {
-		Sleep(100);		// wait for tatally stop
+	if (ENABLE_MOTION_MODULE) {
+		long x = dmc_get_encoder(0, 0);
+		long y = dmc_get_encoder(0, 1);
+		if (ENABLE_VISION_MODULE) {
+			Sleep(100);		// wait for tatally stop
 
-		GrabImage(&Global::g_image, Global::AcqHandle);
-		emit ShowCurrent();
+			GrabImage(&Global::g_image, Global::AcqHandle);
+			emit ShowCurrent();
 
-		QString key = QString::number(itemIndex) + "_" + QString::number(x) + "_" + QString::number(y);
-		Global::halconData.insert(key, Global::g_image);
-		qDebug() << "	->Done.";
+			QString key = QString::number(itemIndex) + "_" + QString::number(x) + "_" + QString::number(y);
+			Global::halconData.insert(key, Global::g_image);
+			qDebug() << "	->Done.";
+		}
 	}
 }
 
@@ -126,6 +130,9 @@ void MotionExecutor::ReturnControl(bool f)
 			dmc_set_position(0, 0, 0);
 			dmc_set_position(0, 1, 0);
 			dmc_set_position(0, 2, 0);
+			dmc_set_encoder(0, 0, 0);
+			dmc_set_encoder(0, 1, 0);
+			dmc_set_encoder(0, 2, 0);
 		}
 		qDebug() << "Setup relative ORG.";
 	}
@@ -200,7 +207,7 @@ void MotionExecutor::run()
 				dx = Global::g_projectInfo.camearItems[sqc].ctrlNodes[i].x() - x0;
 				dy = Global::g_projectInfo.camearItems[sqc].ctrlNodes[i].y() - y0;
 				Coordinator(dx, dy, dz, height);
-				Camera(dx, dy, sqc);
+				Camera(sqc);
 			}
 			Global::g_projectInfo.camearItems[sqc].nTemp = 9999;	// 完成标识
 		}
@@ -210,7 +217,7 @@ void MotionExecutor::run()
 				dy = Global::g_projectInfo.camearItems[sqc].ctrlNodes[i].y() - y0;
 				dz = Global::g_projectInfo.camearItems[sqc].nHeight;
 				Coordinator(dx, dy, dz, height);
-				Camera(dx, dy, sqc);
+				Camera(sqc);
 			}
 			Global::g_projectInfo.camearItems[sqc].nTemp = 9999;
 		}

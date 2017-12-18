@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include "ReportGenerator.h"
 
+#include "DB_RELATIVE\DatabaseBrowser.h"
 #include "Global.h"
 
 
@@ -81,8 +82,8 @@ void ReportGenerator::RefreshData()
 			"<tr>"
 			"<td colspan = '2' align = 'center'>" +
 			Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].content + "</td>"
-			"<td align = 'center'>" +
-			Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].ret + "</td>"
+			"<td align = 'center'>" + QString::number(
+			Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].ret) + "</td>"
 			"<td align = 'center'>记录2</td>"
 			"<td align = 'center'>记录3</td>"
 			"<td align = 'center'>记录4</td>"
@@ -96,7 +97,8 @@ void ReportGenerator::RefreshData()
 		m_data.append(
 			"<tr>"
 			"<td colspan = '2' align = 'center'>" + Global::g_projectInfo.laserItems[i].content + "</td>"
-			"<td align = 'center'>" + Global::g_projectInfo.laserItems[i].ret + "</td>"
+			"<td align = 'center'>" + QString::number(
+				Global::g_projectInfo.laserItems[i].ret) + "</td>"
 			"<td align = 'center'>记录2</td>"
 			"<td align = 'center'>记录3</td>"
 			"<td align = 'center'>记录4</td>"
@@ -123,11 +125,9 @@ void ReportGenerator::showEvent(QShowEvent *e)
 void ReportGenerator::closeEvent(QCloseEvent *e)
 {
 	if (m_isNew) {
-		switch (QMessageBox::warning(this, "保存报表", "测量结果还未保存，确认丢弃吗？", QMessageBox::Cancel | QMessageBox::Ok, QMessageBox::Cancel))
-		{
-		case QMessageBox::Cancel:
+		if (QMessageBox::warning(this, "保存报表", "测量结果还未保存，确认丢弃吗？",
+			QMessageBox::Cancel | QMessageBox::Ok, QMessageBox::Cancel)== QMessageBox::Cancel){
 			return;
-			break;
 		}
 	}
 	QDialog::closeEvent(e);
@@ -143,5 +143,8 @@ void ReportGenerator::on_saveBtn_clicked()
 	ofs << m_data;
 	ofs << "\n";
 
+	DatabaseBrowser::WriteIn(ui.syncSQL->isChecked());
+
 	m_isNew = false;
+	close();
 }

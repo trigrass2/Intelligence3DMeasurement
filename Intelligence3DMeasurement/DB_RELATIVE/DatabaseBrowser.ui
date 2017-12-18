@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>DatabaseBrowser</class>
- <widget class="QWidget" name="DatabaseBrowser">
+ <widget class="QDialog" name="DatabaseBrowser">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,161 +13,195 @@
   <property name="windowTitle">
    <string>记录查询</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QPushButton" name="refreshBtn">
-     <property name="text">
-      <string>刷新</string>
-     </property>
-    </widget>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QPushButton" name="refreshBtn">
+       <property name="text">
+        <string>刷新</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="queryBtn">
+       <property name="text">
+        <string>查询</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="spcBtn">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>SPC</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="3">
+      <widget class="QTreeView" name="tableArea">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="0" column="1">
-    <widget class="QPushButton" name="queryBtn">
-     <property name="text">
-      <string>查询</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="fieldLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>45</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>45</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string> 字段：</string>
-     </property>
-     <property name="buddy">
-      <cstring>fieldBox</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="3">
-    <widget class="QComboBox" name="fieldBox">
-     <property name="minimumSize">
-      <size>
-       <width>180</width>
-       <height>0</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="4">
-    <widget class="QLabel" name="value1Label">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>50</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>50</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>  值1：</string>
-     </property>
-     <property name="buddy">
-      <cstring>value1Edit</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="5">
-    <widget class="QLineEdit" name="value1Edit">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Synax:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;[&lt;span style=&quot; font-style:italic;&quot;&gt;value1, +∞)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;(-&lt;span style=&quot; font-style:italic;&quot;&gt;∞, value2]&lt;/span&gt;&lt;/p&gt;&lt;p&gt;[&lt;span style=&quot; font-style:italic;&quot;&gt;value1, value2]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="6">
-    <widget class="QLabel" name="value2Label">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>50</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>50</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>  值2：</string>
-     </property>
-     <property name="buddy">
-      <cstring>value2Edit</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="7">
-    <widget class="QLineEdit" name="value2Edit">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Synax:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;[&lt;span style=&quot; font-style:italic;&quot;&gt;value1, +∞)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;(-&lt;span style=&quot; font-style:italic;&quot;&gt;∞, value2]&lt;/span&gt;&lt;/p&gt;&lt;p&gt;[&lt;span style=&quot; font-style:italic;&quot;&gt;value1, value2]&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QTreeView" name="tableArea">
-     <property name="minimumSize">
-      <size>
-       <width>300</width>
-       <height>0</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" rowspan="2" colspan="6">
-    <widget class="QTableView" name="dataArea"/>
-   </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="exportBtn">
-     <property name="text">
-      <string>导出</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="spcBtn">
-     <property name="text">
-      <string>SPC</string>
-     </property>
-    </widget>
+   <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLabel" name="fieldLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>45</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>45</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="text">
+        <string> 字段：</string>
+       </property>
+       <property name="buddy">
+        <cstring>fieldBox</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="fieldBox">
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>28</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="value1Label">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>左值：</string>
+       </property>
+       <property name="buddy">
+        <cstring>value1Edit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLineEdit" name="value1Edit">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Synax:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;数值类型直接输入&lt;/p&gt;&lt;p&gt;字符类型需加单引号&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <widget class="QLabel" name="value2Label">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>右值：</string>
+       </property>
+       <property name="buddy">
+        <cstring>value2Edit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
+      <widget class="QLineEdit" name="value2Edit">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>28</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Synax:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;数值类型直接输入&lt;/p&gt;&lt;p&gt;字符类型需加单引号&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="6">
+      <widget class="QTableView" name="dataArea"/>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

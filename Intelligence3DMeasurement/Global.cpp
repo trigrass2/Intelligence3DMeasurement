@@ -9,8 +9,7 @@ double Global::g_laserBiasX;
 double Global::g_laserBiasY;
 double Global::g_laserBiasZ;
 
-bool Global::g_isDBConnected;
-bool Global::g_isLaserConnected ;
+bool Global::g_isLaserConnected;
 
 int Global::g_sampleVolume;
 bool Global::g_enable2DMode;
@@ -18,6 +17,7 @@ bool Global::g_enableQuietMode;
 double Global::g_camViewField;
 
 ProjectInfo Global::g_projectInfo;
+SPC Global::g_spc;
 
 bool Global::g_enableCamCtrl = true;
 HObject Global::g_image;

@@ -175,9 +175,7 @@ MotionCtrlCfgDlg::MotionCtrlCfgDlg(QWidget *parent)
 
 MotionCtrlCfgDlg::~MotionCtrlCfgDlg()
 {
-#if ENABLE_MOTION_MODULE
-	dmc_board_close();
-#endif // ENABLE_MOTION_MODULE
+	if (ENABLE_MOTION_MODULE) { dmc_board_close(); }
 }
 
 void MotionCtrlCfgDlg::closeEvent(QCloseEvent *e)
@@ -191,49 +189,64 @@ void MotionCtrlCfgDlg::closeEvent(QCloseEvent *e)
 
 WORD MotionCtrlCfgDlg::Write2Card(int axis)
 {
-	WORD ret = 0;	// 0表示成功
-#if ENABLE_MOTION_MODULE
-	ret += dmc_set_axis_io_map(0, axis, 0, m_motionCardCfg.nPelType[axis], m_motionCardCfg.nPelNo[axis], m_motionCardCfg.nPelFilter[axis]);
-	ret += dmc_set_axis_io_map(0, axis, 1, m_motionCardCfg.nNelType[axis], m_motionCardCfg.nNelNo[axis], m_motionCardCfg.nNelFilter[axis]);
-	ret += dmc_set_axis_io_map(0, axis, 2, m_motionCardCfg.nOrgType[axis], m_motionCardCfg.nOrgNo[axis], m_motionCardCfg.nOrgFilter[axis]);
-	ret += dmc_set_axis_io_map(0, axis, 3, m_motionCardCfg.nEmgType[axis], m_motionCardCfg.nEmgNo[axis], m_motionCardCfg.nEmgFilter[axis]);
-	ret += dmc_set_axis_io_map(0, axis, 4, m_motionCardCfg.nDstpType[axis], m_motionCardCfg.nDstpNo[axis], m_motionCardCfg.nDstpFilter[axis]);
-	ret += dmc_set_axis_io_map(0, axis, 5, m_motionCardCfg.nAlmType[axis], m_motionCardCfg.nAlmNo[axis], m_motionCardCfg.nAlmFilter[axis]);
-	ret += dmc_set_axis_io_map(0, axis, 7, m_motionCardCfg.nInpType[axis], m_motionCardCfg.nInpNo[axis], m_motionCardCfg.nInpFilter[axis]);
+	WORD ret = 0;
+	if (ENABLE_MOTION_MODULE) {
+		ret += dmc_set_axis_io_map(0, axis, 0, m_motionCardCfg.nPelType[axis],
+			m_motionCardCfg.nPelNo[axis], m_motionCardCfg.nPelFilter[axis]);
+		ret += dmc_set_axis_io_map(0, axis, 1, m_motionCardCfg.nNelType[axis],
+			m_motionCardCfg.nNelNo[axis], m_motionCardCfg.nNelFilter[axis]);
+		ret += dmc_set_axis_io_map(0, axis, 2, m_motionCardCfg.nOrgType[axis],
+			m_motionCardCfg.nOrgNo[axis], m_motionCardCfg.nOrgFilter[axis]);
+		ret += dmc_set_axis_io_map(0, axis, 3, m_motionCardCfg.nEmgType[axis],
+			m_motionCardCfg.nEmgNo[axis], m_motionCardCfg.nEmgFilter[axis]);
+		ret += dmc_set_axis_io_map(0, axis, 4, m_motionCardCfg.nDstpType[axis],
+			m_motionCardCfg.nDstpNo[axis], m_motionCardCfg.nDstpFilter[axis]);
+		ret += dmc_set_axis_io_map(0, axis, 5, m_motionCardCfg.nAlmType[axis],
+			m_motionCardCfg.nAlmNo[axis], m_motionCardCfg.nAlmFilter[axis]);
+		ret += dmc_set_axis_io_map(0, axis, 7, m_motionCardCfg.nInpType[axis],
+			m_motionCardCfg.nInpNo[axis], m_motionCardCfg.nInpFilter[axis]);
 
-	ret += dmc_set_pulse_outmode(0, axis, m_motionCardCfg.nPulseModeIndex[axis]);
+		ret += dmc_set_pulse_outmode(0, axis, m_motionCardCfg.nPulseModeIndex[axis]);
 
-	ret += dmc_set_counter_inmode(0, axis, m_motionCardCfg.nInputModeIndex[axis]);
-	ret += dmc_set_ez_mode(0, axis, m_motionCardCfg.nEZLvLIndex[axis]);
+		ret += dmc_set_counter_inmode(0, axis, m_motionCardCfg.nInputModeIndex[axis]);
+		ret += dmc_set_ez_mode(0, axis, m_motionCardCfg.nEZLvLIndex[axis]);
 
-	ret += dmc_set_home_pin_logic(0, axis, m_motionCardCfg.nHrLvLIndex[axis]);
-	ret += dmc_set_homemode(0, axis, m_motionCardCfg.nHrDirectionIndex[axis], m_motionCardCfg.nHrSpeedIndex[axis],
-		m_motionCardCfg.nHrModeIndex[axis]);
+		ret += dmc_set_home_pin_logic(0, axis, m_motionCardCfg.nHrLvLIndex[axis]);
+		ret += dmc_set_homemode(0, axis, m_motionCardCfg.nHrDirectionIndex[axis],
+			m_motionCardCfg.nHrSpeedIndex[axis],
+			m_motionCardCfg.nHrModeIndex[axis]);
 
-	ret += dmc_set_el_mode(0, axis, m_motionCardCfg.nHdwLimitEnableIndex[axis], m_motionCardCfg.nHdwLimitLvLIndex[axis],
-		m_motionCardCfg.nHdwLimitModeIndex[axis]);
-	ret += dmc_set_softlimit(0, axis, m_motionCardCfg.nSfwLimitEnableIndex[axis], m_motionCardCfg.nSfwLimitCounterIndex[axis],
-		m_motionCardCfg.nSfwLimitModeIndex[axis], m_motionCardCfg.nSfwLimitPPostion[axis], m_motionCardCfg.nSfwLimitNPostion[axis]);
-	ret += dmc_set_io_dstp_mode(0, axis, m_motionCardCfg.nIODstpEnableIndex[axis], m_motionCardCfg.nIODstpLvLIndex[axis]);
-	ret += dmc_set_dec_stop_time(0, axis, m_motionCardCfg.nIODstpTime[axis]);
-	ret += dmc_set_emg_mode(0, axis, m_motionCardCfg.nEmgEnableIndex[axis], m_motionCardCfg.nEmgLvLIndex[axis]);
-	ret += dmc_set_alm_mode(0, axis, m_motionCardCfg.nAlmEnableIndex[axis], m_motionCardCfg.nAlmLvLIndex[axis], 0);
-	ret += dmc_set_inp_mode(0, axis, m_motionCardCfg.nInpEnableIndex[axis], m_motionCardCfg.nInpLvLIndex[axis]);
-#endif // ENABLE_MOTION_MODULE
+		ret += dmc_set_el_mode(0, axis, m_motionCardCfg.nHdwLimitEnableIndex[axis],
+			m_motionCardCfg.nHdwLimitLvLIndex[axis],
+			m_motionCardCfg.nHdwLimitModeIndex[axis]);
+		ret += dmc_set_softlimit(0, axis, m_motionCardCfg.nSfwLimitEnableIndex[axis],
+			m_motionCardCfg.nSfwLimitCounterIndex[axis],
+			m_motionCardCfg.nSfwLimitModeIndex[axis], m_motionCardCfg.nSfwLimitPPostion[axis],
+			m_motionCardCfg.nSfwLimitNPostion[axis]);
+		ret += dmc_set_io_dstp_mode(0, axis, m_motionCardCfg.nIODstpEnableIndex[axis],
+			m_motionCardCfg.nIODstpLvLIndex[axis]);
+		ret += dmc_set_dec_stop_time(0, axis, m_motionCardCfg.nIODstpTime[axis]);
+		ret += dmc_set_emg_mode(0, axis, m_motionCardCfg.nEmgEnableIndex[axis],
+			m_motionCardCfg.nEmgLvLIndex[axis]);
+		ret += dmc_set_alm_mode(0, axis, m_motionCardCfg.nAlmEnableIndex[axis],
+			m_motionCardCfg.nAlmLvLIndex[axis], 0);
+		ret += dmc_set_inp_mode(0, axis, m_motionCardCfg.nInpEnableIndex[axis],
+			m_motionCardCfg.nInpLvLIndex[axis]);
+	}
 	return ret;
 }
 
 void MotionCtrlCfgDlg::ApplyConfig()
 {
-#if ENABLE_MOTION_MODULE
-	if (dmc_board_init()) {
-		dmc_write_sevon_pin(0, 0, 0);
-		dmc_write_sevon_pin(0, 1, 0);
-		dmc_write_sevon_pin(0, 2, 1);
-		on_wrtAllBtn_clicked();
+	if (ENABLE_MOTION_MODULE) {
+		if (dmc_board_init()) {
+			dmc_write_sevon_pin(0, 0, 0);
+			dmc_write_sevon_pin(0, 1, 0);
+			dmc_write_sevon_pin(0, 2, 1);
+			on_wrtAllBtn_clicked();
+		}
+		else { qDebug() << "Motion control card initialization failed!"; }
 	}
-	else { qDebug() << "Motion control card initialization failed!"; }
-#endif // ENABLE_MOTION_MODULE
 }
 
 void MotionCtrlCfgDlg::on_wrtAllBtn_clicked()
@@ -254,9 +267,7 @@ void MotionCtrlCfgDlg::on_resetBtn_clicked()
 		return;
 		break;
 	case QMessageBox::Ok:
-#if ENABLE_MOTION_MODULE
-		dmc_board_reset();
-#endif // ENABLE_MOTION_MODULE
+		if (ENABLE_MOTION_MODULE) { dmc_board_reset(); }
 		exit(0);
 		break;
 	};

@@ -163,7 +163,7 @@ void LaserPortCfgDlg::GetData()
 	ui.testShowEdit->setText(data);
 
 	if (m_currentIndex != 9999) {
-		Global::g_projectInfo.laserItems[m_currentIndex].ret = data;
+		Global::g_projectInfo.laserItems[m_currentIndex].ret = data.toDouble();
 		m_currentIndex = 9999;
 	}
 }

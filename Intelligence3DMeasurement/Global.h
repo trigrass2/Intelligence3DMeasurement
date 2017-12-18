@@ -4,12 +4,13 @@
 #include <QVector>
 #include <QPointF>
 #include <QMap>
+#include <QDateTime>
 
 #include "HALCONCpp/HalconCpp.h"
 #include "HALCONCpp/HDevThread.h"
 
 #define ENABLE_VISION_MODULE false
-#define ENABLE_MOTION_MODULE true
+#define ENABLE_MOTION_MODULE false
 
 #define PROJECT_DIRECTORY "../Projects/"
 #define CAD_DIRECTORY "../CADs/"
@@ -40,8 +41,8 @@ struct CAMERAITEM {
 	double dStandard;
 	double dUpper;
 	double dLower;
-	QString ret;					///< return
-	QString conclusion;
+	double ret = 0.0;				///< return
+	QString conclusion="N";
 };
 
 struct LASERITEM {
@@ -51,8 +52,8 @@ struct LASERITEM {
 	double dStandard;
 	double dUpper;
 	double dLower;
-	QString ret;				///< result
-	QString conclusion;
+	double ret = 0.0;			///< result
+	QString conclusion= "N";
 };
 
 struct ProjectInfo {
@@ -72,6 +73,17 @@ struct ProjectInfo {
 	QPointF startPoint;
 };
 
+struct SPC {
+	QString table;
+	QString item;
+	QDateTime lTime;
+	QDateTime rTime;
+	bool bF0 = true;
+	bool bF1 = false;
+	bool bF2 = false;
+	bool bF3 = false;
+};
+
 
 class Global
 {
@@ -87,7 +99,6 @@ public:
 	static double g_laserBiasY;
 	static double g_laserBiasZ;
 
-	static bool g_isDBConnected;
 	static bool g_isLaserConnected;
 
 	// Data Process Config
@@ -97,6 +108,7 @@ public:
 	static double g_camViewField;
 
 	static ProjectInfo g_projectInfo;
+	static SPC g_spc;
 
 	// Halcon
 	static bool g_enableCamCtrl;

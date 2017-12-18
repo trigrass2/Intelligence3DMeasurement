@@ -1273,7 +1273,7 @@ public:
 
         retranslateUi(MotionCtrlCfgDlg);
 
-        tabWidget->setCurrentIndex(1);
+        tabWidget->setCurrentIndex(2);
         nelTypeBox->setCurrentIndex(1);
         orgTypeBox->setCurrentIndex(2);
         emgTypeBox->setCurrentIndex(6);
