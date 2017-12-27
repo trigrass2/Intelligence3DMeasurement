@@ -12,7 +12,7 @@ public:
 	~Vision();
 
 signals:
-	void ProcessDone();
+	void VisionProcessDone();
 
 private slots:
 	void ImgProc();

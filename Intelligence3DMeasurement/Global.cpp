@@ -1,5 +1,8 @@
 #include "Global.h"
 
+
+bool Global::g_isLocked;
+
 double Global::g_pulseEquivalent;
 
 double Global::g_xyLineVectorVel;
@@ -11,7 +14,6 @@ double Global::g_laserBiasZ;
 
 bool Global::g_isLaserConnected;
 
-int Global::g_sampleVolume;
 bool Global::g_enable2DMode;
 bool Global::g_enableQuietMode;
 double Global::g_camViewField;

@@ -202,20 +202,20 @@ void MotionExecutor::run()
 	Q_FOREACH(int sqc, Global::g_projectInfo.camSequence) {
 		double dx, dy, dz;
 		if (Global::g_projectInfo.camearItems[sqc].bIsInverted) {
-			dz = Global::g_projectInfo.camearItems[sqc].nHeight;
-			for (int i = Global::g_projectInfo.camearItems[sqc].ctrlNodes.count() - 1; i >= 0; --i) {
-				dx = Global::g_projectInfo.camearItems[sqc].ctrlNodes[i].x() - x0;
-				dy = Global::g_projectInfo.camearItems[sqc].ctrlNodes[i].y() - y0;
+			dz = Global::g_projectInfo.camearItems[sqc].nCADHeight;
+			for (int i = Global::g_projectInfo.camearItems[sqc].cadPos.count() - 1; i >= 0; --i) {
+				dx = Global::g_projectInfo.camearItems[sqc].cadPos[i].x() - x0;
+				dy = Global::g_projectInfo.camearItems[sqc].cadPos[i].y() - y0;
 				Coordinator(dx, dy, dz, height);
 				Camera(sqc);
 			}
 			Global::g_projectInfo.camearItems[sqc].nTemp = 9999;	// 完成标识
 		}
 		else {
-			for (int i = 0; i < Global::g_projectInfo.camearItems[sqc].ctrlNodes.count(); ++i) {
-				dx = Global::g_projectInfo.camearItems[sqc].ctrlNodes[i].x() - x0;
-				dy = Global::g_projectInfo.camearItems[sqc].ctrlNodes[i].y() - y0;
-				dz = Global::g_projectInfo.camearItems[sqc].nHeight;
+			for (int i = 0; i < Global::g_projectInfo.camearItems[sqc].cadPos.count(); ++i) {
+				dx = Global::g_projectInfo.camearItems[sqc].cadPos[i].x() - x0;
+				dy = Global::g_projectInfo.camearItems[sqc].cadPos[i].y() - y0;
+				dz = Global::g_projectInfo.camearItems[sqc].nCADHeight;
 				Coordinator(dx, dy, dz, height);
 				Camera(sqc);
 			}
@@ -225,14 +225,16 @@ void MotionExecutor::run()
 
 	qDebug() << "Enter laser area.";
 	for (int index = 0; index < Global::g_projectInfo.laserItems.count(); ++index) {
-		double dx, dy, dz = Global::g_projectInfo.laserItems[index].nHeight;
+		double dx, dy, dz = Global::g_projectInfo.laserItems[index].nCADHeight;
 		BiasCorrectionZ(dz);
-		for (int i = 0; i < Global::g_projectInfo.laserItems[index].nodes.count(); ++i) {
-			dx = Global::g_projectInfo.laserItems[index].nodes[i].x() - x0;
-			dy = Global::g_projectInfo.laserItems[index].nodes[i].y() - y0;
+		Global::g_projectInfo.laserItems[index].directReading.clear();
+		for (int i = 0; i < Global::g_projectInfo.laserItems[index].cadPos.count(); ++i) {
+			dx = Global::g_projectInfo.laserItems[index].cadPos[i].x() - x0;
+			dy = Global::g_projectInfo.laserItems[index].cadPos[i].y() - y0;
 			BiasCorrectionXY(dx, dy);
 			Coordinator(dx, dy, dz, height);
 			emit LaserRequire(index);
+			Sleep(10);
 		}
 	}
 

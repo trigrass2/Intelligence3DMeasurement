@@ -28,32 +28,37 @@ enum MeasureType {
 	AA,
 	CIC,
 	LEN,
-	STN
+	STN,
+	FTN
 };
 
 struct CAMERAITEM {
-	int type;						///< type of measurement
-	QString content;				///< content of measurement
-	QVector<QPointF> ctrlNodes;		///< control points(x-y) of measurement
-	int nHeight;					///< camera height
-	bool bIsInverted;				///< invert flag
-	int nTemp = 0;					///< reserved variable
+	int nType;							///< type of measurement
+	QString content;					///< content of measurement
+	QVector<QPointF> cadPos;			///< control points(x-y) of measurement
+	QVector<QPointF> feedbackPos;		///< real coordinate
+	int nCADHeight;						///< camera height
+	bool bIsInverted;					///< invert flag
+	int nTemp = 0;						///< reserved variable
 	double dStandard;
 	double dUpper;
 	double dLower;
-	double ret = 0.0;				///< return
-	QString conclusion="N";
+	double ret[7] = { 0,0,0,0,0,0,0 };	///< return
+	QString conclusion;					///< result
 };
 
 struct LASERITEM {
-	QString content;			///< content of measurement
-	QVector<QPointF> nodes;		///< points(x-y) of measurement
-	int nHeight;				///< laser height
+	int nType;
+	QString content;
+	QVector<QPointF> cadPos;
+	QVector<QPointF> feedbackPos;
+	QVector<double> directReading;
+	int nCADHeight;						///< laser height
 	double dStandard;
 	double dUpper;
 	double dLower;
-	double ret = 0.0;			///< result
-	QString conclusion= "N";
+	double ret[7] = {0,0,0,0,0,0,0};
+	QString conclusion;
 };
 
 struct ProjectInfo {
@@ -71,6 +76,7 @@ struct ProjectInfo {
 	QVector<CAMERAITEM> camearItems;
 	QVector<LASERITEM> laserItems;
 	QPointF startPoint;
+	int nSubGroup;		///< Data Process Config
 };
 
 struct SPC {
@@ -88,6 +94,8 @@ struct SPC {
 class Global
 {
 public:
+	static bool g_isLocked;
+
 	static double g_pulseEquivalent;
 
 	// Mesure Speed
@@ -102,8 +110,7 @@ public:
 	static bool g_isLaserConnected;
 
 	// Data Process Config
-	static int g_sampleVolume;
-	static bool g_enable2DMode;	
+	static bool g_enable2DMode;
 	static bool g_enableQuietMode;
 	static double g_camViewField;
 

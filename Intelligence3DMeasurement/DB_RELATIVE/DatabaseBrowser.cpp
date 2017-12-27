@@ -28,45 +28,66 @@ DatabaseBrowser::DatabaseBrowser(QWidget *parent)
 	on_refreshBtn_clicked();
 }
 
-void DatabaseBrowser::WriteIn(bool f)
+bool DatabaseBrowser::WriteIn(bool f)
 {
 	if (f) {
 		QSqlQuery q;
-		q.exec("CREATE TABLE IF NOT EXISTS " + Global::g_projectInfo.projectName + "("
-			"Project_ID INT(11) NOT NULL AUTO_INCREMENT,"
-			"Content VARCHAR(40) NOT NULL,"
-			"Standard DOUBLE NOT NULL,"
-			"Upper DOUBLE NOT NULL,"
-			"Lower DOUBLE NOT NULL,"
-			"Ret DOUBLE NOT NULL,"
-			"Conclusion VARCHAR(40) NOT NULL,"
-			"MDate DATETIME NOT NULL,"
-			"PRIMARY KEY(Project_ID));"
-		);
+		QString tableTemplate = "CREATE TABLE IF NOT EXISTS %1("
+			"ID INT(11) NOT NULL AUTO_INCREMENT,"
+			"product_model VARCHAR(40),"
+			"order_number VARCHAR(40),"
+			"m_date DATETIME NOT NULL,"
+			"m_item VARCHAR(40),"
+			"m_dimesion VARCHAR(40) NOT NULL,";
+		for (int i = 0; i < Global::g_projectInfo.nSubGroup; ++i) {
+			tableTemplate.append("ipqc" + QString::number(i + 1) + " DOUBLE NOT NULL,");
+		}
+		tableTemplate.append(
+			"m_result VARCHAR(40),"
+			"subgroup INT(11) NOT NULL,"
+			"PRIMARY KEY(ID));");
+
+		q.exec(tableTemplate.arg(Global::g_projectInfo.projectName));
+
+		QString dataTemplate = "INSERT INTO " + Global::g_projectInfo.projectName +
+			"(product_model,order_number,m_date,m_item,m_dimesion,";
+		for (int i = 0; i < Global::g_projectInfo.nSubGroup; ++i) {
+			dataTemplate.append("ipqc" + QString::number(i + 1) + ",");
+		}
+		dataTemplate.append("m_result,subgroup) VALUES('"+Global::g_projectInfo.productModel+
+			"','"+Global::g_projectInfo.orderNumber+"','"+
+			Global::g_projectInfo.mesurementDate+"',%1,%2,");
+		int t = 0;
+		for (; t < Global::g_projectInfo.nSubGroup; ++t) {
+			dataTemplate.append("%" + QString::number(t + 3) + ",");
+		}
+		dataTemplate.append("%" + QString::number(t + 4) + ",");
+		dataTemplate.append(QString::number(Global::g_projectInfo.nSubGroup) + ");");
 
 		bool isSuccessed = true;
 		Q_FOREACH(CAMERAITEM cam, Global::g_projectInfo.camearItems) {
-			QString cmd = "INSERT INTO " + Global::g_projectInfo.projectName +
-				"(Content,Standard,Upper,Lower,Ret,Conclusion,MDate) "
-				"VALUES('" + cam.content + "'," +
-				QString::number(cam.dStandard) + "," +
-				QString::number(cam.dUpper) + "," +
-				QString::number(cam.dLower) + "," + QString::number(cam.ret) + ","
-				"'" + cam.conclusion + "',"
-				"'" + Global::g_projectInfo.mesurementDate + "');";
+			QString cmd = dataTemplate.arg("'"+cam.content+"'").arg(
+				"'" + QString::number(cam.dStandard) + "|" +
+				QString::number(cam.dLower) + "|" + QString::number(cam.dUpper) + "'");
+			for (int i = 0; i < Global::g_projectInfo.nSubGroup; ++i) {
+				cmd = cmd.arg(QString::number(cam.ret[i]));
+			}
+			cmd = cmd.arg("'" + cam.conclusion + "'");
 			qDebug() << cmd;
 			isSuccessed = isSuccessed & q.exec(cmd);
+			qDebug() << q.lastError();
 		}
 		Q_FOREACH(LASERITEM la, Global::g_projectInfo.laserItems) {
-			isSuccessed = isSuccessed & q.exec("INSERT INTO " + Global::g_projectInfo.projectName +
-				"(Content,Standard,Upper,Lower,Ret,Conclusion,MDate) "
-				"VALUES('" + la.content + "'," +
-				QString::number(la.dStandard) + "," +
-				QString::number(la.dUpper) + "," +
-				QString::number(la.dLower) + "," + QString::number(la.ret) + ","
-				"'" + la.conclusion + "',"
-				"'" + Global::g_projectInfo.mesurementDate + "');"
-			);
+			QString cmd = dataTemplate.arg("'" + la.content + "'").arg(
+				"'" + QString::number(la.dStandard) + "|" +
+				QString::number(la.dLower) + "|" + QString::number(la.dUpper) + "'");
+			for (int i = 0; i < Global::g_projectInfo.nSubGroup; ++i) {
+				cmd = cmd.arg(QString::number(la.ret[i]));
+			}
+			cmd = cmd.arg("'" + la.conclusion + "'");
+			qDebug() << cmd;
+			isSuccessed = isSuccessed & q.exec(cmd);
+			qDebug() << q.lastError();
 		}
 
 		if (isSuccessed) {
@@ -75,7 +96,9 @@ void DatabaseBrowser::WriteIn(bool f)
 		else {
 			QMessageBox::warning(Q_NULLPTR, "数据库", "数据写入失败！", QMessageBox::Ok);
 		}
+		return isSuccessed;
 	}
+	return false;
 }
 
 void DatabaseBrowser::on_refreshBtn_clicked()

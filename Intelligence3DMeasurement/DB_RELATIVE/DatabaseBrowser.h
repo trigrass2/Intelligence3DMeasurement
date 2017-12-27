@@ -17,7 +17,7 @@ class DatabaseBrowser : public QDialog
 
 public:
 	DatabaseBrowser(QWidget *parent = Q_NULLPTR);
-	static void WriteIn(bool f);
+	static bool WriteIn(bool f);
 
 private:
 	Ui::DatabaseBrowser ui;

@@ -117,7 +117,7 @@ void DxfPainter::keyPressEvent(QKeyEvent * event)
 		UpdateSqc();
 		break;
 	case Qt::Key_Space:
-		if (!Global::g_enable2DMode) {
+		if (Global::g_enable2DMode) {
 			MarkItem *item = new MarkItem(1);
 			item->setPos(m_currentCursorPos);
 			m_dxfScene->addItem(item);
@@ -250,10 +250,10 @@ void DxfPainter::UpdateSqc()
 		double min = INT_MAX;
 		bool isInverted = false;
 		for (int i = 0; i < items.count(); ++i) {
-			qDebug() << "item->"<<items.at(i).nTemp <<"//"<< items.at(i).nHeight;
+			qDebug() << "item->"<<items.at(i).nTemp <<"//"<< items.at(i).nCADHeight;
 			if (items.at(i).nTemp != 1) {
-				double d0 = P_DISTANCE(previousNode, items.at(i).ctrlNodes.first());
-				double d1 = P_DISTANCE(previousNode, items.at(i).ctrlNodes.last());
+				double d0 = P_DISTANCE(previousNode, items.at(i).cadPos.first());
+				double d1 = P_DISTANCE(previousNode, items.at(i).cadPos.last());
 				if ((d0 < d1) && (d0 < min)) {
 					min = d0;
 					index = i;
@@ -271,8 +271,8 @@ void DxfPainter::UpdateSqc()
 				}
 			}
 		}
-		if (isInverted) { previousNode = items.at(index).ctrlNodes.first(); }
-		else{ previousNode = items.at(index).ctrlNodes.last(); }
+		if (isInverted) { previousNode = items.at(index).cadPos.first(); }
+		else{ previousNode = items.at(index).cadPos.last(); }
 		items[index].nTemp = 1;		// processed
 		Global::g_projectInfo.camSequence.append(index);
 		Global::g_projectInfo.camearItems[index].bIsInverted = isInverted;
@@ -291,12 +291,12 @@ void DxfPainter::LoadPathItem()
 	path.append(Global::g_projectInfo.startPoint);
 	Q_FOREACH(int sqc, Global::g_projectInfo.camSequence) {
 		if (Global::g_projectInfo.camearItems.at(sqc).bIsInverted) {
-			for (int i = Global::g_projectInfo.camearItems.at(sqc).ctrlNodes.count() - 1; i >= 0; --i) {
-				path << Global::g_projectInfo.camearItems.at(sqc).ctrlNodes.at(i);
+			for (int i = Global::g_projectInfo.camearItems.at(sqc).cadPos.count() - 1; i >= 0; --i) {
+				path << Global::g_projectInfo.camearItems.at(sqc).cadPos.at(i);
 			}
 		}
 		else {
-			path << Global::g_projectInfo.camearItems.at(sqc).ctrlNodes;
+			path << Global::g_projectInfo.camearItems.at(sqc).cadPos;
 		}
 	}
 	if (path.count() > 0) {
@@ -309,13 +309,13 @@ void DxfPainter::LoadPathItem()
 
 	path1.append(path.last());
 	Q_FOREACH(LASERITEM item, Global::g_projectInfo.laserItems) {
-		for (int i = 0; i < item.nodes.count(); ++i) {
+		for (int i = 0; i < item.cadPos.count(); ++i) {
 			MarkItem *laserItem = new MarkItem(1);
-			laserItem->setPos(item.nodes.at(i));
+			laserItem->setPos(item.cadPos.at(i));
 			laserItem->SetProcessed();
 			m_dxfScene->addItem(laserItem);
 		}
-		path1.append(item.nodes);
+		path1.append(item.cadPos);
 	}
 	if (path1.count() > 0) {
 		if (m_hasPathItem1) { delete m_pathItem1; }
@@ -451,14 +451,14 @@ void DxfPainter::ActivateMarkItem(const QModelIndex & index)
 	ClearMarkItem(0);
 	int camCount = Global::g_projectInfo.camearItems.count();
 	if (index.row() < camCount) {
-		Q_FOREACH(QPointF p, Global::g_projectInfo.camearItems.at(index.row()).ctrlNodes) {
+		Q_FOREACH(QPointF p, Global::g_projectInfo.camearItems.at(index.row()).cadPos) {
 			MarkItem *mark = new MarkItem();
 			mark->setPos(p);
 			m_dxfScene->addItem(mark);
 		}
 	}
 	else {
-		Q_FOREACH(QPointF p, Global::g_projectInfo.laserItems.at(index.row() - camCount).nodes) {
+		Q_FOREACH(QPointF p, Global::g_projectInfo.laserItems.at(index.row() - camCount).cadPos) {
 			MarkItem *mark = new MarkItem();
 			mark->setPos(p);
 			m_dxfScene->addItem(mark);
@@ -500,14 +500,14 @@ void DxfPainter::SampleOfL2LDist()
 	d4 = P_DISTANCE(line0E, line1E);
 	min = qMin(qMin(d1, d2), qMin(d3, d4));
 	CAMERAITEM lineItem;
-	if (min == d1) { lineItem.ctrlNodes << line0E << line0S << line1S << line1E; }
-	else if (min == d2) { lineItem.ctrlNodes << line0E << line0S << line1E << line1S; }
-	else if (min == d3) { lineItem.ctrlNodes << line0S << line0E << line1S << line1E; }
-	else { lineItem.ctrlNodes << line0S << line0E << line1E << line1S; }
+	if (min == d1) { lineItem.cadPos << line0E << line0S << line1S << line1E; }
+	else if (min == d2) { lineItem.cadPos << line0E << line0S << line1E << line1S; }
+	else if (min == d3) { lineItem.cadPos << line0S << line0E << line1S << line1E; }
+	else { lineItem.cadPos << line0S << line0E << line1E << line1S; }
 
-	lineItem.type = MeasureType::L2LD;
+	lineItem.nType = MeasureType::L2LD;
 	lineItem.content = "Line-line distance";
-	lineItem.nHeight = 0;
+	lineItem.nCADHeight = 0;
 	Global::g_projectInfo.camearItems.append(lineItem);
 
 	emit NodeListTableUpdate();
@@ -536,14 +536,14 @@ void DxfPainter::SampleOfL2LAngle()
 	d4 = P_DISTANCE(line0E, line1E);
 	min = qMin(qMin(d1, d2), qMin(d3, d4));
 	CAMERAITEM lineItem;
-	if (min == d1) { lineItem.ctrlNodes << line0E << line0S << line1S << line1E; }
-	else if (min == d2) { lineItem.ctrlNodes << line0E << line0S << line1E << line1S; }
-	else if (min == d3) { lineItem.ctrlNodes << line0S << line0E << line1S << line1E; }
-	else { lineItem.ctrlNodes << line0S << line0E << line1E << line1S; }
+	if (min == d1) { lineItem.cadPos << line0E << line0S << line1S << line1E; }
+	else if (min == d2) { lineItem.cadPos << line0E << line0S << line1E << line1S; }
+	else if (min == d3) { lineItem.cadPos << line0S << line0E << line1S << line1E; }
+	else { lineItem.cadPos << line0S << line0E << line1E << line1S; }
 
-	lineItem.type = MeasureType::L2LA;
+	lineItem.nType = MeasureType::L2LA;
 	lineItem.content = "Line-line angle";
-	lineItem.nHeight = 0;
+	lineItem.nCADHeight = 0;
 	Global::g_projectInfo.camearItems.append(lineItem);
 
 	emit NodeListTableUpdate();
@@ -634,30 +634,30 @@ void DxfPainter::SampleOfP2PDist()
 			d3 = P_DISTANCE(c02, c10);
 			d4 = P_DISTANCE(c02, c12);
 			min = qMin(qMin(d1, d2), qMin(d3, d4));
-			if (min == d1) { ellipseItem.ctrlNodes << c02 << c01 << c00 << c10 << c11 << c12; }
-			else if (min == d2) { ellipseItem.ctrlNodes << c02 << c01 << c00 << c12 << c11 << c10; }
-			else if (min == d3) { ellipseItem.ctrlNodes << c00 << c01 << c02 << c10 << c11 << c12; }
-			else { ellipseItem.ctrlNodes << c00 << c01 << c02 << c12 << c11 << c10; }
+			if (min == d1) { ellipseItem.cadPos << c02 << c01 << c00 << c10 << c11 << c12; }
+			else if (min == d2) { ellipseItem.cadPos << c02 << c01 << c00 << c12 << c11 << c10; }
+			else if (min == d3) { ellipseItem.cadPos << c00 << c01 << c02 << c10 << c11 << c12; }
+			else { ellipseItem.cadPos << c00 << c01 << c02 << c12 << c11 << c10; }
 		}
 		if (isBig0 && !isBig1) {
 			double d1, d2, d3, d4, min;
 			d1 = P_DISTANCE(c00, c11);
 			d2 = P_DISTANCE(c02, c11);
-			if (d1 <= d2) { ellipseItem.ctrlNodes << c02 << c01 << c00 << c11; }
-			else { ellipseItem.ctrlNodes << c00 << c01 << c02 << c11; }
+			if (d1 <= d2) { ellipseItem.cadPos << c02 << c01 << c00 << c11; }
+			else { ellipseItem.cadPos << c00 << c01 << c02 << c11; }
 		}
 		if (!isBig0 && isBig1) {
 			double d1, d2, d3, d4, min;
 			d1 = P_DISTANCE(c10, c00);
 			d2 = P_DISTANCE(c12, c00);
-			if (d1 <= d2) { ellipseItem.ctrlNodes << c12 << c11 << c10 << c00; }
-			else { ellipseItem.ctrlNodes << c10 << c11 << c12 << c00; }
+			if (d1 <= d2) { ellipseItem.cadPos << c12 << c11 << c10 << c00; }
+			else { ellipseItem.cadPos << c10 << c11 << c12 << c00; }
 		}
-		if (!isBig0 && !isBig1) { ellipseItem.ctrlNodes << c00 << c11; }
+		if (!isBig0 && !isBig1) { ellipseItem.cadPos << c00 << c11; }
 
-		ellipseItem.type = MeasureType::P2PD;
+		ellipseItem.nType = MeasureType::P2PD;
 		ellipseItem.content = "Point-point distance";
-		ellipseItem.nHeight = 0;
+		ellipseItem.nCADHeight = 0;
 		Global::g_projectInfo.camearItems.append(ellipseItem);
 
 		emit NodeListTableUpdate();
@@ -723,22 +723,22 @@ void DxfPainter::SampleOfP2LDist()
 		d3 = P_DISTANCE(c2, ls);
 		d4 = P_DISTANCE(c2, le);
 		min = qMin(qMin(d1, d2), qMin(d3, d4));
-		if (min == d1) { item.ctrlNodes << c2 << c1 << c0 << ls << le; }
-		else if (min == d2) { item.ctrlNodes << c2 << c1 << c0 << le << ls; }
-		else if (min == d3) { item.ctrlNodes << c0 << c1 << c2 << ls << le; }
-		else { item.ctrlNodes << c0 << c1 << c2 << le << ls; }
+		if (min == d1) { item.cadPos << c2 << c1 << c0 << ls << le; }
+		else if (min == d2) { item.cadPos << c2 << c1 << c0 << le << ls; }
+		else if (min == d3) { item.cadPos << c0 << c1 << c2 << ls << le; }
+		else { item.cadPos << c0 << c1 << c2 << le << ls; }
 	}
 	else {
 		double d1, d2, d3, d4, min;
 		d1 = P_DISTANCE(c0, ls);
 		d2 = P_DISTANCE(c0, le);
-		if (d1 <= d2) { item.ctrlNodes << c0 << ls << le; }
-		else { item.ctrlNodes << c0 << le << ls; }
+		if (d1 <= d2) { item.cadPos << c0 << ls << le; }
+		else { item.cadPos << c0 << le << ls; }
 	}
 
-	item.type = MeasureType::P2LD;
+	item.nType = MeasureType::P2LD;
 	item.content = "Point-line distance";
-	item.nHeight = 0;
+	item.nCADHeight= 0;
 	Global::g_projectInfo.camearItems.append(item);
 
 	emit NodeListTableUpdate();
@@ -787,12 +787,12 @@ void DxfPainter::SampleOfRadius()
 	ellipse->SetProcessed();
 
 	CAMERAITEM ellipseItem;
-	if (isBig){ ellipseItem.ctrlNodes << c0 << c1 << c2; }
-	else { ellipseItem.ctrlNodes << c0; }
+	if (isBig){ ellipseItem.cadPos << c0 << c1 << c2; }
+	else { ellipseItem.cadPos << c0; }
 
-	ellipseItem.type = MeasureType::RAD;
+	ellipseItem.nType = MeasureType::RAD;
 	ellipseItem.content = "Radius";
-	ellipseItem.nHeight = 0;
+	ellipseItem.nCADHeight = 0;
 	Global::g_projectInfo.camearItems.append(ellipseItem);
 
 	emit NodeListTableUpdate();
@@ -841,12 +841,12 @@ void DxfPainter::SampleOfArcAngle()
 	ellipse->SetProcessed();
 
 	CAMERAITEM ellipseItem;
-	if (isBig) { ellipseItem.ctrlNodes << c0 << c1 << c2; }
-	else { ellipseItem.ctrlNodes << c0; }
+	if (isBig) { ellipseItem.cadPos << c0 << c1 << c2; }
+	else { ellipseItem.cadPos << c0; }
 
-	ellipseItem.type = MeasureType::AA;
+	ellipseItem.nType = MeasureType::AA;
 	ellipseItem.content = "Arc angle";
-	ellipseItem.nHeight = 0;
+	ellipseItem.nCADHeight = 0;
 	Global::g_projectInfo.camearItems.append(ellipseItem);
 
 	emit NodeListTableUpdate();
@@ -895,12 +895,12 @@ void DxfPainter::SampleOfCircular()
 	ellipse->SetProcessed();
 
 	CAMERAITEM ellipseItem;
-	if (isBig) { ellipseItem.ctrlNodes << c0 << c1 << c2; }
-	else { ellipseItem.ctrlNodes << c0; }
+	if (isBig) { ellipseItem.cadPos << c0 << c1 << c2; }
+	else { ellipseItem.cadPos << c0; }
 
-	ellipseItem.type = MeasureType::CIC;
+	ellipseItem.nType = MeasureType::CIC;
 	ellipseItem.content = "Circular";
-	ellipseItem.nHeight = 0;
+	ellipseItem.nCADHeight = 0;
 	Global::g_projectInfo.camearItems.append(ellipseItem);
 
 	emit NodeListTableUpdate();
@@ -918,11 +918,11 @@ void DxfPainter::SampleOfLength()
 	line->SetProcessed();
 
 	CAMERAITEM lineItem;
-	lineItem.ctrlNodes << ls << le;
+	lineItem.cadPos << ls << le;
 
-	lineItem.type = MeasureType::LEN;
+	lineItem.nType = MeasureType::LEN;
 	lineItem.content = "Length";
-	lineItem.nHeight = 0;
+	lineItem.nCADHeight = 0;
 	Global::g_projectInfo.camearItems.append(lineItem);
 
 	emit NodeListTableUpdate();
@@ -941,7 +941,7 @@ void DxfPainter::SampleOfStraightness()
 	double length = qSqrt(d);
 	
 	CAMERAITEM lineItem;
-	if (d <= Global::g_camViewField){ lineItem.ctrlNodes << ls << le; }
+	if (d <= Global::g_camViewField){ lineItem.cadPos << ls << le; }
 	else {
 		double slope = (le.y() - ls.y()) / (le.x() - ls.x());
 		int count = qCeil(length / Global::g_camViewField );
@@ -951,14 +951,14 @@ void DxfPainter::SampleOfStraightness()
 			QPointF p;
 			p.setX(ls.x() + increase);
 			p.setY(ls.y() + increase*slope);
-			lineItem.ctrlNodes << p;
+			lineItem.cadPos << p;
 		}
 	}
 	line->SetProcessed();
 
-	lineItem.type = MeasureType::LEN;
+	lineItem.nType = MeasureType::LEN;
 	lineItem.content = "Straightness";
-	lineItem.nHeight = 0;
+	lineItem.nCADHeight = 0;
 	Global::g_projectInfo.camearItems.append(lineItem);
 
 	emit NodeListTableUpdate();
@@ -971,11 +971,12 @@ void DxfPainter::SampleOfHeight()
 	LASERITEM laserItem;
 	Q_FOREACH(QGraphicsItem *item, m_dxfScene->selectedItems()) {
 		MARK_PTR_CAST(item)->SetProcessed();
-		laserItem.nodes.append(item->pos());
+		laserItem.cadPos.append(item->pos());
 	}
 
+	laserItem.nType = MeasureType::FTN;
 	laserItem.content = "Height";
-	laserItem.nHeight = 0;
+	laserItem.nCADHeight = 0;
 	Global::g_projectInfo.laserItems.append(laserItem);
 
 	emit NodeListTableUpdate();

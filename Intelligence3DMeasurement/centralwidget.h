@@ -12,7 +12,8 @@
 #include "ReportGenerator.h"
 #include "MOTION_RELATIVE\CameraCtrl.h"
 #include "MOTION_RELATIVE\MotionExecutor.h"
-#include "VISION_RELATIVE\Vision.h"
+#include "M_ALGRITHM_RELATIVE\Vision.h"
+#include "M_ALGRITHM_RELATIVE\Laser.h"
 
 
 class CentralWidget : public QWidget
@@ -21,7 +22,6 @@ class CentralWidget : public QWidget
 
 public:
 	CentralWidget(QWidget *parent = Q_NULLPTR);
-	~CentralWidget();
 
 private:
 	Ui::CentralWidget ui;
@@ -31,6 +31,7 @@ private:
 	MotionExecutor *executor;
 	ReportGenerator *reporter;
 	Vision *visionModule;
+	Laser *LaserAlgrithm;
 
 signals:
 	void ProjectNew(bool isCleanOpen);

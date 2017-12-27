@@ -12,6 +12,7 @@ public:
 	ProcessTypeCfgDlg(QWidget *parent = Q_NULLPTR);
 
 protected:
+	void showEvent(QShowEvent *e) Q_DECL_OVERRIDE;
 	void closeEvent(QCloseEvent *e) Q_DECL_OVERRIDE;
 
 private:

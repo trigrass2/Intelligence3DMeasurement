@@ -81,10 +81,10 @@ public:
 
         subGroupVolSlider = new QSlider(groupBox_2);
         subGroupVolSlider->setObjectName(QStringLiteral("subGroupVolSlider"));
-        subGroupVolSlider->setMinimumSize(QSize(250, 0));
+        subGroupVolSlider->setMinimumSize(QSize(0, 0));
         subGroupVolSlider->setMaximumSize(QSize(250, 16777215));
         subGroupVolSlider->setMinimum(1);
-        subGroupVolSlider->setMaximum(17);
+        subGroupVolSlider->setMaximum(7);
         subGroupVolSlider->setPageStep(3);
         subGroupVolSlider->setOrientation(Qt::Horizontal);
 
@@ -196,7 +196,7 @@ public:
     {
         ProcessTypeCfgDlg->setWindowTitle(QApplication::translate("ProcessTypeCfgDlg", "\346\225\260\346\215\256\345\244\204\347\220\206\351\205\215\347\275\256", Q_NULLPTR));
         groupBox_2->setTitle(QApplication::translate("ProcessTypeCfgDlg", "\346\265\213\351\207\217\346\250\241\345\274\217", Q_NULLPTR));
-        label->setText(QApplication::translate("ProcessTypeCfgDlg", "\351\207\215\345\244\215\346\254\241\346\225\260\357\274\232", Q_NULLPTR));
+        label->setText(QApplication::translate("ProcessTypeCfgDlg", "\346\257\217\346\211\271\346\225\260\351\207\217\357\274\232", Q_NULLPTR));
         subGroupVolLabel->setText(QApplication::translate("ProcessTypeCfgDlg", "1", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
         xyMeasureBtn->setToolTip(QApplication::translate("ProcessTypeCfgDlg", "<html><head/><body><p>\344\270\215\344\275\277\347\224\250\346\277\200\345\205\211\357\274\214\345\217\252\350\277\233\350\241\214X-Y\345\271\263\351\235\242\346\265\213\351\207\217</p></body></html>", Q_NULLPTR));

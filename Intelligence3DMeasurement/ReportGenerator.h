@@ -23,7 +23,7 @@ private:
 	Ui::ReportGenerator ui;
 
 	bool m_isNew;
-	QString m_data;
+	QString m_report;
 
 public slots:
 	void on_saveBtn_clicked();

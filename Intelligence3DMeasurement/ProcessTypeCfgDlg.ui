@@ -73,7 +73,7 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>重复次数：</string>
+           <string>每批数量：</string>
           </property>
           <property name="buddy">
            <cstring>subGroupVolSlider</cstring>
@@ -84,7 +84,7 @@
          <widget class="QSlider" name="subGroupVolSlider">
           <property name="minimumSize">
            <size>
-            <width>250</width>
+            <width>0</width>
             <height>0</height>
            </size>
           </property>
@@ -98,7 +98,7 @@
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>17</number>
+           <number>7</number>
           </property>
           <property name="pageStep">
            <number>3</number>

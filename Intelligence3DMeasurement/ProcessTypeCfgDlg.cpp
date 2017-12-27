@@ -1,5 +1,6 @@
 #include <QSettings>
 #include <QFileDialog>
+#include <QDebug>
 #include "ProcessTypeCfgDlg.h"
 
 #include "Global.h"
@@ -14,20 +15,17 @@ ProcessTypeCfgDlg::ProcessTypeCfgDlg(QWidget *parent)
 	QFileInfo cfgFile("./config.ini");
 	if (cfgFile.isFile()) {
 		QSettings cfgFile("./config.ini", QSettings::IniFormat);
-		Global::g_sampleVolume = cfgFile.value("/PROCESS/SampleVolume").toInt();
-		Global::g_enable2DMode = cfgFile.value("/PROCESS/MeasureMode_X_Y").toBool();
-		Global::g_enableQuietMode = cfgFile.value("/PROCESS/QuietMode").toBool();
-		Global::g_camViewField = cfgFile.value("/PROCESS/CoverArea").toDouble();
+		Global::g_enable2DMode = cfgFile.value("PROCESS/MeasureMode_X_Y").toBool();
+		Global::g_enableQuietMode = cfgFile.value("PROCESS/QuietMode").toBool();
+		Global::g_camViewField = cfgFile.value("PROCESS/CoverArea").toDouble();
 	}
 	else {
-		Global::g_sampleVolume = 1;
 		Global::g_enable2DMode = false;
 		Global::g_enableQuietMode = false;
 		Global::g_camViewField = 15.0;
 	}
 	// -END
 
-	ui.subGroupVolSlider->setValue(Global::g_sampleVolume);
 	if (!Global::g_isLaserConnected) {
 		ui.xyMeasureBtn->setChecked(true);
 		ui.xyzMeasureBtn->setDisabled(true);
@@ -44,10 +42,22 @@ ProcessTypeCfgDlg::ProcessTypeCfgDlg(QWidget *parent)
 	connect(ui.viewField, SIGNAL(valueChanged(double)), this, SLOT(SyncMem()));
 }
 
+void ProcessTypeCfgDlg::showEvent(QShowEvent *e)
+{
+	qDebug() << Global::g_isLocked;
+	if (Global::g_isLocked) {
+		ui.subGroupVolSlider->setDisabled(Global::g_isLocked);
+		ui.subGroupVolSlider->setValue(Global::g_projectInfo.nSubGroup);
+	}
+	else {
+		ui.subGroupVolSlider->setDisabled(Global::g_isLocked);
+		ui.subGroupVolSlider->setValue(1);
+	}
+}
+
 void ProcessTypeCfgDlg::closeEvent(QCloseEvent *e)
 {
 	QSettings cfgFile("./config.ini", QSettings::IniFormat);
-	cfgFile.setValue("/PROCESS/SampleVolume", Global::g_sampleVolume);
 	cfgFile.setValue("/PROCESS/MeasureMode_X_Y", Global::g_enable2DMode);
 	cfgFile.setValue("/PROCESS/QuietMode", Global::g_enableQuietMode);
 	cfgFile.setValue("/PROCESS/CoverArea", Global::g_camViewField);
@@ -55,7 +65,7 @@ void ProcessTypeCfgDlg::closeEvent(QCloseEvent *e)
 
 void ProcessTypeCfgDlg::SyncMem()
 {
-	Global::g_sampleVolume = ui.subGroupVolSlider->value();
+	Global::g_projectInfo.nSubGroup = ui.subGroupVolSlider->value();
 	Global::g_enable2DMode = ui.xyMeasureBtn->isChecked();
 	Global::g_enableQuietMode = ui.autoSaveBtn->isChecked();
 	Global::g_camViewField = ui.viewField->value();
