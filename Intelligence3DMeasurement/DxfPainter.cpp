@@ -17,7 +17,7 @@
 
 
 DxfPainter::DxfPainter(QWidget *parent) : QGraphicsView(parent),
-	m_zoomRatio(1.0), m_zoomMax(8), m_zoomMin(0.8), m_zoomStep(0.1),
+	m_zoomRatio(1.0), m_zoomMax(10), m_zoomMin(0.8), m_zoomStep(0.1),
 	m_hasPathItem(false), m_hasPathItem1(false), m_absorptionDis(8.0)
 {
 	setContextMenuPolicy(Qt::DefaultContextMenu);
@@ -57,32 +57,32 @@ void DxfPainter::contextMenuEvent(QContextMenuEvent *event)
 	if (items.count() == 2) {
 		if (items.first()->type() == DXF_POLY && items.last()->type() == DXF_POLY) {
 			connect(contextMenu.addAction("线 - 线：间距"), SIGNAL(triggered(bool)), this, SLOT(SampleOfL2LDist()));
-			connect(contextMenu.addAction("线 - 线：夹角"), SIGNAL(triggered(bool)), this, SLOT(SampleOfL2LAngle()));
+			connect(contextMenu.addAction("线 - 线：夹角"), SIGNAL(triggered(bool)), this, SLOT(SampleTheL2LAngle()));
 		}
 		else if (items.first()->type() == DXF_ELLIPSE && items.last()->type() == DXF_ELLIPSE) {
-			connect(contextMenu.addAction("点 - 点：间距"), SIGNAL(triggered(bool)), this, SLOT(SampleOfP2PDist()));
+			connect(contextMenu.addAction("点 - 点：间距"), SIGNAL(triggered(bool)), this, SLOT(SampleTheP2PDist()));
 		}
 		else if ((items.first()->type() == DXF_ELLIPSE && items.last()->type() == DXF_POLY) ||
 			(items.first()->type() == DXF_POLY && items.last()->type() == DXF_ELLIPSE)) {
-			connect(contextMenu.addAction("点 - 线：间距"), SIGNAL(triggered(bool)), this, SLOT(SampleOfP2LDist()));
+			connect(contextMenu.addAction("点 - 线：间距"), SIGNAL(triggered(bool)), this, SLOT(SampleTheP2LDist()));
 		}
 		else if (items.first()->type() == DXF_MARK && items.last()->type() == DXF_MARK) {
-			connect(contextMenu.addAction("激光测高"), SIGNAL(triggered(bool)), this, SLOT(SampleOfHeight()));
+			connect(contextMenu.addAction("激光测高"), SIGNAL(triggered(bool)), this, SLOT(SampleTheHeight()));
 		}
 		contextMenu.exec(QCursor::pos());
 	}
 	else if (items.count() == 1) {
 		if (items.first()->type() == DXF_ELLIPSE) {
-			connect(contextMenu.addAction("半径"), SIGNAL(triggered(bool)), this, SLOT(SampleOfRadius()));
-			connect(contextMenu.addAction("弧角"), SIGNAL(triggered(bool)), this, SLOT(SampleOfArcAngle()));
-			connect(contextMenu.addAction("圆度"), SIGNAL(triggered(bool)), this, SLOT(SampleOfCircular()));
+			connect(contextMenu.addAction("半径"), SIGNAL(triggered(bool)), this, SLOT(SampleTheRadius()));
+			connect(contextMenu.addAction("弧角"), SIGNAL(triggered(bool)), this, SLOT(SampleTheArcAngle()));
+			connect(contextMenu.addAction("圆度"), SIGNAL(triggered(bool)), this, SLOT(SampleTheCircular()));
 		}
 		else if (items.first()->type() == DXF_POLY) {
 			connect(contextMenu.addAction("长度"), SIGNAL(triggered(bool)), this, SLOT(SampleOfLength()));
-			connect(contextMenu.addAction("直线度"), SIGNAL(triggered(bool)), this, SLOT(SampleOfStraightness()));
+			connect(contextMenu.addAction("直线度"), SIGNAL(triggered(bool)), this, SLOT(SampleTheStraightness()));
 		}
 		else if (items.first()->type() == DXF_MARK) {
-			connect(contextMenu.addAction("激光测高"), SIGNAL(triggered(bool)), this, SLOT(SampleOfHeight()));
+			connect(contextMenu.addAction("激光测高"), SIGNAL(triggered(bool)), this, SLOT(SampleTheHeight()));
 		}
 		contextMenu.exec(QCursor::pos());
 	}
@@ -92,7 +92,7 @@ void DxfPainter::contextMenuEvent(QContextMenuEvent *event)
 			if (item->type() != DXF_MARK) { isLaser = false; }
 		}
 		if (isLaser) {
-			connect(contextMenu.addAction("激光测高"), SIGNAL(triggered(bool)), this, SLOT(SampleOfHeight()));
+			connect(contextMenu.addAction("激光测高"), SIGNAL(triggered(bool)), this, SLOT(SampleTheHeight()));
 			contextMenu.exec(QCursor::pos());
 		}
 	}
@@ -117,7 +117,7 @@ void DxfPainter::keyPressEvent(QKeyEvent * event)
 		UpdateSqc();
 		break;
 	case Qt::Key_Space:
-		if (Global::g_enable2DMode) {
+		if (!Global::g_enable2DMode) {
 			MarkItem *item = new MarkItem(1);
 			item->setPos(m_currentCursorPos);
 			m_dxfScene->addItem(item);
@@ -241,8 +241,8 @@ void DxfPainter::UpdateSqc()
 	QPointF begin(GetNearest(endPoints, m_currentCursorPos));
 
 	// connnect
-	Global::g_projectInfo.camSequence.clear();
-	QList<CAMERAITEM> items(Global::g_projectInfo.camearItems.toList());
+	Global::g_projectInfo.camMeasurePath.clear();
+	QList<CAMERAITEM> items(Global::g_projectInfo.camItemList.toList());
 	QPointF previousNode(begin);
 	int n = items.count();
 	while (n--) {
@@ -250,10 +250,9 @@ void DxfPainter::UpdateSqc()
 		double min = INT_MAX;
 		bool isInverted = false;
 		for (int i = 0; i < items.count(); ++i) {
-			qDebug() << "item->"<<items.at(i).nTemp <<"//"<< items.at(i).nCADHeight;
 			if (items.at(i).nTemp != 1) {
-				double d0 = P_DISTANCE(previousNode, items.at(i).cadPos.first());
-				double d1 = P_DISTANCE(previousNode, items.at(i).cadPos.last());
+				double d0 = P_DISTANCE(previousNode, items.at(i).cadPosList.first());
+				double d1 = P_DISTANCE(previousNode, items.at(i).cadPosList.last());
 				if ((d0 < d1) && (d0 < min)) {
 					min = d0;
 					index = i;
@@ -271,14 +270,14 @@ void DxfPainter::UpdateSqc()
 				}
 			}
 		}
-		if (isInverted) { previousNode = items.at(index).cadPos.first(); }
-		else{ previousNode = items.at(index).cadPos.last(); }
+		if (isInverted) { previousNode = items.at(index).cadPosList.first(); }
+		else{ previousNode = items.at(index).cadPosList.last(); }
 		items[index].nTemp = 1;		// processed
-		Global::g_projectInfo.camSequence.append(index);
-		Global::g_projectInfo.camearItems[index].bIsInverted = isInverted;
+		Global::g_projectInfo.camMeasurePath.append(index);
+		Global::g_projectInfo.camItemList[index].bPosListInverted = isInverted;
 	}
 
-	Global::g_projectInfo.startPoint = begin;
+	Global::g_projectInfo.startCADPos = begin;
 	LoadPathItem();
 }
 /**
@@ -288,15 +287,15 @@ void DxfPainter::LoadPathItem()
 {
 	QVector<QPointF> path, path1;
 
-	path.append(Global::g_projectInfo.startPoint);
-	Q_FOREACH(int sqc, Global::g_projectInfo.camSequence) {
-		if (Global::g_projectInfo.camearItems.at(sqc).bIsInverted) {
-			for (int i = Global::g_projectInfo.camearItems.at(sqc).cadPos.count() - 1; i >= 0; --i) {
-				path << Global::g_projectInfo.camearItems.at(sqc).cadPos.at(i);
+	path.append(Global::g_projectInfo.startCADPos);
+	Q_FOREACH(int sqc, Global::g_projectInfo.camMeasurePath) {
+		if (Global::g_projectInfo.camItemList.at(sqc).bPosListInverted) {
+			for (int i = Global::g_projectInfo.camItemList.at(sqc).cadPosList.count() - 1; i >= 0; --i) {
+				path << Global::g_projectInfo.camItemList.at(sqc).cadPosList.at(i);
 			}
 		}
 		else {
-			path << Global::g_projectInfo.camearItems.at(sqc).cadPos;
+			path << Global::g_projectInfo.camItemList.at(sqc).cadPosList;
 		}
 	}
 	if (path.count() > 0) {
@@ -308,14 +307,14 @@ void DxfPainter::LoadPathItem()
 	}
 
 	path1.append(path.last());
-	Q_FOREACH(LASERITEM item, Global::g_projectInfo.laserItems) {
-		for (int i = 0; i < item.cadPos.count(); ++i) {
+	Q_FOREACH(LASERITEM item, Global::g_projectInfo.laserItemList) {
+		for (int i = 0; i < item.cadPosList.count(); ++i) {
 			MarkItem *laserItem = new MarkItem(1);
-			laserItem->setPos(item.cadPos.at(i));
+			laserItem->setPos(item.cadPosList.at(i));
 			laserItem->SetProcessed();
 			m_dxfScene->addItem(laserItem);
 		}
-		path1.append(item.cadPos);
+		path1.append(item.cadPosList);
 	}
 	if (path1.count() > 0) {
 		if (m_hasPathItem1) { delete m_pathItem1; }
@@ -348,14 +347,14 @@ void DxfPainter::Translator(QPointF delta)
  */
 void DxfPainter::OpenDXF(bool isCleanOpen)
 {
-	QString path = CAD_DIRECTORY + Global::g_projectInfo.cadFile;
+	QString path = CAD_DIRECTORY + Global::g_projectInfo.cadFileName;
 	EntitiesParser4DXF *entities = new EntitiesParser4DXF(path);
 	entities->covPolyline2Line();		// disable polyline
 
 	if (isCleanOpen) {
-		Global::g_projectInfo.camSequence.clear();
-		Global::g_projectInfo.camearItems.clear();
-		Global::g_projectInfo.laserItems.clear();
+		Global::g_projectInfo.camMeasurePath.clear();
+		Global::g_projectInfo.camItemList.clear();
+		Global::g_projectInfo.laserItemList.clear();
 	}
 
 	qDeleteAll(m_dxfScene->items());
@@ -431,9 +430,9 @@ void DxfPainter::Replan()
 		if (item->type() == DXF_ELLIPSE) { ELLIPSE_PTR_CAST(item)->SetProcessed(false); }
 	}
 
-	Global::g_projectInfo.camSequence.clear();
-	Global::g_projectInfo.camearItems.clear();
-	Global::g_projectInfo.laserItems.clear();
+	Global::g_projectInfo.camMeasurePath.clear();
+	Global::g_projectInfo.camItemList.clear();
+	Global::g_projectInfo.laserItemList.clear();
 }
 /**
  * @brief	Load existing project
@@ -449,17 +448,17 @@ void DxfPainter::LoadProject()
 void DxfPainter::ActivateMarkItem(const QModelIndex & index)
 {
 	ClearMarkItem(0);
-	int camCount = Global::g_projectInfo.camearItems.count();
+	int camCount = Global::g_projectInfo.camItemList.count();
 	if (index.row() < camCount) {
-		Q_FOREACH(QPointF p, Global::g_projectInfo.camearItems.at(index.row()).cadPos) {
-			MarkItem *mark = new MarkItem();
+		Q_FOREACH(QPointF p, Global::g_projectInfo.camItemList.at(index.row()).cadPosList) {
+			MarkItem *mark = new MarkItem(0, Global::g_camViewField);
 			mark->setPos(p);
 			m_dxfScene->addItem(mark);
 		}
 	}
 	else {
-		Q_FOREACH(QPointF p, Global::g_projectInfo.laserItems.at(index.row() - camCount).cadPos) {
-			MarkItem *mark = new MarkItem();
+		Q_FOREACH(QPointF p, Global::g_projectInfo.laserItemList.at(index.row() - camCount).cadPosList) {
+			MarkItem *mark = new MarkItem(1);
 			mark->setPos(p);
 			m_dxfScene->addItem(mark);
 		}
@@ -476,151 +475,341 @@ void DxfPainter::ClearMarkItem(int morph)
 		}
 	}
 }
-/**
- * @brief	Line to line distance
- */
+
 void DxfPainter::SampleOfL2LDist()
 {
+	QVector<QPointF> ctrlPosList0, ctrlPosList1;
+
 	DXFPolylineItem *line0 = POLY_PTR_CAST(m_dxfScene->selectedItems().first());
 	DXFPolylineItem *line1 = POLY_PTR_CAST(m_dxfScene->selectedItems().last());
-	
-	QPointF line0S, line0E, line1S, line1E;
-	line0S = line0->PolygonF().first();
-	line0E = line0->PolygonF().last();
-	line1S = line1->PolygonF().first();
-	line1E = line1->PolygonF().last();
+
+	QPointF ls0, le0;
+	ls0 = line0->PolygonF().first();
+	le0 = line0->PolygonF().last();
+
+	double _d0 = P_DISTANCE(ls0, le0);
+	double length0 = qSqrt(_d0);
+
+	if (_d0 <= Global::g_camViewField) { ctrlPosList0 << ls0 << le0; }
+	else {		// long
+		int count = qCeil(length0 / Global::g_camViewField) + 1;
+
+		if (le0.x() - ls0.x() == 0) {
+			double deltaY = (le0.y() - ls0.y()) / count;
+			
+			for (int i = 0; i < count + 1; ++i) {
+				double increase = (double)i * deltaY;
+				QPointF p;
+				p.setX(ls0.x());
+				p.setY(ls0.y() + increase);
+				ctrlPosList0 << p;
+			}
+		}
+		else {
+			double slope = (le0.y() - ls0.y()) / (le0.x() - ls0.x());
+			double deltaX = (le0.x() - ls0.x()) / count;
+
+			for (int i = 0; i < count + 1; ++i) {
+				double increase = (double)i * deltaX;
+				QPointF p;
+				p.setX(ls0.x() + increase);
+				p.setY(ls0.y() + increase*slope);
+				ctrlPosList0 << p;
+			}
+		}
+	}
 	line0->SetProcessed();
+
+	QPointF ls1, le1;
+	ls1 = line1->PolygonF().first();
+	le1 = line1->PolygonF().last();
+
+	double _d1 = P_DISTANCE(ls1, le1);
+	double length1 = qSqrt(_d1);
+
+	if (_d1 <= Global::g_camViewField) {
+		ctrlPosList1 << ls1 << le1;
+	}
+	else {		// long
+		int count = qCeil(length1 / Global::g_camViewField) + 1;
+
+		if (le1.x() - ls1.x() == 0) {
+			double deltaY = (le1.y() - ls1.y()) / count;
+
+			for (int i = 0; i < count + 1; ++i) {
+				double increase = (double)i * deltaY;
+				QPointF p;
+				p.setX(ls1.x());
+				p.setY(ls1.y() + increase);
+				ctrlPosList1 << p;
+			}
+		}
+		else {
+			double slope = (le1.y() - ls1.y()) / (le1.x() - ls1.x());
+			double deltaX = (le1.x() - ls1.x()) / count;
+
+			for (int i = 0; i < count + 1; ++i) {
+				double increase = (double)i * deltaX;
+				QPointF p;
+				p.setX(ls1.x() + increase);
+				p.setY(ls1.y() + increase*slope);
+				ctrlPosList1 << p;
+			}
+		}
+	}
 	line1->SetProcessed();
 
-	// shortest(local) path connection
-	double d1, d2, d3, d4, min;
-	d1 = P_DISTANCE(line0S, line1S);
-	d2 = P_DISTANCE(line0S, line1E);
-	d3 = P_DISTANCE(line0E, line1S);
-	d4 = P_DISTANCE(line0E, line1E);
-	min = qMin(qMin(d1, d2), qMin(d3, d4));
 	CAMERAITEM lineItem;
-	if (min == d1) { lineItem.cadPos << line0E << line0S << line1S << line1E; }
-	else if (min == d2) { lineItem.cadPos << line0E << line0S << line1E << line1S; }
-	else if (min == d3) { lineItem.cadPos << line0S << line0E << line1S << line1E; }
-	else { lineItem.cadPos << line0S << line0E << line1E << line1S; }
+	double d1, d2, d3, d4, min;
+	d1 = P_DISTANCE(ctrlPosList0.first(), ctrlPosList1.first());
+	d2 = P_DISTANCE(ctrlPosList0.first(), ctrlPosList1.last());
+	d3 = P_DISTANCE(ctrlPosList0.last(), ctrlPosList1.first());
+	d4 = P_DISTANCE(ctrlPosList0.last(), ctrlPosList1.last());
+	min = qMin(qMin(d1, d2), qMin(d3, d4));
+
+	if (min == d1) {
+		while (!ctrlPosList0.isEmpty()) { lineItem.cadPosList << ctrlPosList0.takeLast(); }
+		lineItem.cadPosList << ctrlPosList1;
+	}
+	else if (min == d2) {
+		while (!ctrlPosList0.isEmpty()) { lineItem.cadPosList << ctrlPosList0.takeLast(); }
+		while (!ctrlPosList1.isEmpty()) { lineItem.cadPosList << ctrlPosList1.takeLast(); }
+	}
+	else if (min == d3) { lineItem.cadPosList << ctrlPosList0 << ctrlPosList1; }
+	else {
+		lineItem.cadPosList << ctrlPosList0;
+		while (!ctrlPosList1.isEmpty()) { lineItem.cadPosList << ctrlPosList1.takeLast(); }
+	}
 
 	lineItem.nType = MeasureType::L2LD;
-	lineItem.content = "Line-line distance";
-	lineItem.nCADHeight = 0;
-	Global::g_projectInfo.camearItems.append(lineItem);
+	Global::g_projectInfo.camItemList.append(lineItem);
 
 	emit NodeListTableUpdate();
 }
-/**
- * @brief	Line to line angle
- */
-void DxfPainter::SampleOfL2LAngle()
+
+void DxfPainter::SampleTheL2LAngle()
 {
+	QVector<QPointF> ctrlPosList0, ctrlPosList1;
+
 	DXFPolylineItem *line0 = POLY_PTR_CAST(m_dxfScene->selectedItems().first());
 	DXFPolylineItem *line1 = POLY_PTR_CAST(m_dxfScene->selectedItems().last());
 
-	QPointF line0S, line0E, line1S, line1E;
-	line0S = line0->PolygonF().first();
-	line0E = line0->PolygonF().last();
-	line1S = line1->PolygonF().first();
-	line1E = line1->PolygonF().last();
-	line0->SetProcessed();
-	line1->SetProcessed();
+	QPointF ls0, le0;
+	ls0 = line0->PolygonF().first();
+	le0 = line0->PolygonF().last();
 
-	// minor angle connection
-	double d1, d2, d3, d4, min;
-	d1 = P_DISTANCE(line0S, line1S);
-	d2 = P_DISTANCE(line0S, line1E);
-	d3 = P_DISTANCE(line0E, line1S);
-	d4 = P_DISTANCE(line0E, line1E);
-	min = qMin(qMin(d1, d2), qMin(d3, d4));
+	double _d0 = P_DISTANCE(ls0, le0);
+	double length0 = qSqrt(_d0);
+
+	if (_d0 <= Global::g_camViewField) { ctrlPosList0 << ls0 << le0; }
+	else {		// long
+		int count = qCeil(length0 / Global::g_camViewField) + 1;
+
+		if (le0.x() - ls0.x() == 0) {
+			double deltaY = (le0.y() - ls0.y()) / count;
+
+			for (int i = 0; i < count + 1; ++i) {
+				double increase = (double)i * deltaY;
+				QPointF p;
+				p.setX(ls0.x());
+				p.setY(ls0.y() + increase);
+				ctrlPosList0 << p;
+			}
+		}
+		else {
+			double slope = (le0.y() - ls0.y()) / (le0.x() - ls0.x());
+			double deltaX = (le0.x() - ls0.x()) / count;
+
+			for (int i = 0; i < count + 1; ++i) {
+				double increase = (double)i * deltaX;
+				QPointF p;
+				p.setX(ls0.x() + increase);
+				p.setY(ls0.y() + increase*slope);
+				ctrlPosList0 << p;
+			}
+		}
+	}
+	line0->SetProcessed();
+
+	QPointF ls1, le1;
+	ls1 = line1->PolygonF().first();
+	le1 = line1->PolygonF().last();
+
+	double _d1 = P_DISTANCE(ls1, le1);
+	double length1 = qSqrt(_d1);
+
+	if (_d1 <= Global::g_camViewField) {
+		ctrlPosList1 << ls1 << le1;
+	}
+	else {		// long
+		int count = qCeil(length1 / Global::g_camViewField) + 1;
+
+		if (le1.x() - ls1.x() == 0) {
+			double deltaY = (le1.y() - ls1.y()) / count;
+
+			for (int i = 0; i < count + 1; ++i) {
+				double increase = (double)i * deltaY;
+				QPointF p;
+				p.setX(ls1.x());
+				p.setY(ls1.y() + increase);
+				ctrlPosList1 << p;
+			}
+		}
+		else {
+			double slope = (le1.y() - ls1.y()) / (le1.x() - ls1.x());
+			double deltaX = (le1.x() - ls1.x()) / count;
+
+			for (int i = 0; i < count + 1; ++i) {
+				double increase = (double)i * deltaX;
+				QPointF p;
+				p.setX(ls1.x() + increase);
+				p.setY(ls1.y() + increase*slope);
+				ctrlPosList1 << p;
+			}
+		}
+	}
+	line1->SetProcessed();
+	
 	CAMERAITEM lineItem;
-	if (min == d1) { lineItem.cadPos << line0E << line0S << line1S << line1E; }
-	else if (min == d2) { lineItem.cadPos << line0E << line0S << line1E << line1S; }
-	else if (min == d3) { lineItem.cadPos << line0S << line0E << line1S << line1E; }
-	else { lineItem.cadPos << line0S << line0E << line1E << line1S; }
+	double d1, d2, d3, d4, min;
+	d1 = P_DISTANCE(ctrlPosList0.first(), ctrlPosList1.first());
+	d2 = P_DISTANCE(ctrlPosList0.first(), ctrlPosList1.last());
+	d3 = P_DISTANCE(ctrlPosList0.last(), ctrlPosList1.first());
+	d4 = P_DISTANCE(ctrlPosList0.last(), ctrlPosList1.last());
+	min = qMin(qMin(d1, d2), qMin(d3, d4));
+	
+	if (min == d1) {
+		while (!ctrlPosList0.isEmpty()) { lineItem.cadPosList << ctrlPosList0.takeLast(); }
+		lineItem.cadPosList << ctrlPosList1;
+	}
+	else if (min == d2) {
+		while (!ctrlPosList0.isEmpty()) { lineItem.cadPosList << ctrlPosList0.takeLast(); }
+		while (!ctrlPosList1.isEmpty()) { lineItem.cadPosList << ctrlPosList1.takeLast(); }
+	}
+	else if (min == d3) { lineItem.cadPosList << ctrlPosList0 << ctrlPosList1; }
+	else {
+		lineItem.cadPosList << ctrlPosList0;
+		while (!ctrlPosList1.isEmpty()) { lineItem.cadPosList << ctrlPosList1.takeLast(); }
+	}
 
 	lineItem.nType = MeasureType::L2LA;
-	lineItem.content = "Line-line angle";
-	lineItem.nCADHeight = 0;
-	Global::g_projectInfo.camearItems.append(lineItem);
+	Global::g_projectInfo.camItemList.append(lineItem);
 
 	emit NodeListTableUpdate();
 }
-/**
- * @brief	Point to point distance
- */
-void DxfPainter::SampleOfP2PDist()
+
+void DxfPainter::SampleTheP2PDist()
 {
+	QVector<QPointF> ctrlPosList0, ctrlPosList1;
+	bool isBig0, isBig1;
+
 	DXFEllipseItem *ellipse0 = ELLIPSE_PTR_CAST(m_dxfScene->selectedItems().first());
 	DXFEllipseItem *ellipse1 = ELLIPSE_PTR_CAST(m_dxfScene->selectedItems().last());
 
 	if ((ellipse0->LALength() == ellipse0->SALength()) && (ellipse1->LALength() == ellipse1->SALength())) {
-		QPointF c00, c01, c02, c10, c11, c12;
-		bool isBig0, isBig1;
-
 		if (2 * ellipse0->LALength() <= Global::g_camViewField) {
-			// one point
-			c00.setX(ellipse0->pos().x());
-			c00.setY(ellipse0->pos().y());
+			QPointF p;
+			p.setX(ellipse0->pos().x());
+			p.setY(ellipse0->pos().y());
+			ctrlPosList0 << p;
 			isBig0 = false;
 		}
 		else {
-			// three points locate a circle
-			if (ellipse0->SpanAngle() >= 360.0) {		// closed circle
-				c00.setX(ellipse0->pos().x());
-				c00.setY(ellipse0->pos().y() - ellipse0->SALength());
-				c01.setX(ellipse0->pos().x() + ellipse0->LALength() * qCos(qDegreesToRadians(30.0)));
-				c01.setY(ellipse0->pos().y() + ellipse0->SALength() / 2);
-				c02.setX(ellipse0->pos().x() - ellipse0->LALength() * qCos(qDegreesToRadians(30.0)));
-				c02.setY(c01.y());
+			double halfStepAngle = qRadiansToDegrees(qAsin(Global::g_camViewField / 2.0 /
+				ellipse0->LALength()));
+			if (ellipse0->SpanAngle() >= 360.0) {	// closed circle
+				double splitNo = qCeil(360.0 / halfStepAngle / 2.0) + 1;
+				double stepAngle = 360.0 / splitNo;
+				
+				for (int i = 0; i < splitNo; ++i) {
+					double angle = stepAngle*i + 0.0;
+					QPointF p;
+					p.setX(ellipse0->pos().x() + ellipse0->LALength() * qCos(qDegreesToRadians(angle)));
+					p.setY(ellipse0->pos().y() + ellipse0->LALength() * qSin(qDegreesToRadians(angle)));
+					ctrlPosList0 << p;
+				}
 			}
 			else {		// open arc
-				c00.setX(ellipse0->pos().x() + ellipse0->LALength() *
-					qCos(qDegreesToRadians(ellipse0->StartAngle())));
-				c00.setY(ellipse0->pos().y() + ellipse0->SALength() *
-					qSin(qDegreesToRadians(ellipse0->StartAngle())));
-				c01.setX(ellipse0->pos().x() + ellipse0->LALength() *
-					qCos(qDegreesToRadians(ellipse0->StartAngle() + ellipse0->SpanAngle() / 2)));
-				c01.setY(ellipse0->pos().y() + ellipse0->SALength() *
-					qSin(qDegreesToRadians(ellipse0->StartAngle() + ellipse0->SpanAngle() / 2)));
-				c02.setX(ellipse0->pos().x() + ellipse0->LALength() *
-					qCos(qDegreesToRadians(ellipse0->EndAngle())));
-				c02.setY(ellipse0->pos().y() + ellipse0->SALength() *
-					qSin(qDegreesToRadians(ellipse0->EndAngle())));
+				double splitNo = qCeil(ellipse0->SpanAngle() / halfStepAngle / 2.0) + 1;
+				double stepAngle = ellipse0->SpanAngle() / splitNo;
+				
+				for (int i = 0; i < splitNo + 1; ++i) {
+					QPointF p;
+					if (0 == i) {
+						p.setX(ellipse0->pos().x() + ellipse0->LALength() *
+							qCos(qDegreesToRadians(ellipse0->StartAngle())));
+						p.setY(ellipse0->pos().y() + ellipse0->LALength() *
+							qSin(qDegreesToRadians(ellipse0->StartAngle())));
+					}
+					else if (splitNo == i) {
+						p.setX(ellipse0->pos().x() + ellipse0->LALength() *
+							qCos(qDegreesToRadians(ellipse0->EndAngle())));
+						p.setY(ellipse0->pos().y() + ellipse0->LALength() *
+							qSin(qDegreesToRadians(ellipse0->EndAngle())));
+					}
+					else {
+						double angle = ellipse0->StartAngle() + stepAngle*i;
+						p.setX(ellipse0->pos().x() + ellipse0->LALength() *
+							qCos(qDegreesToRadians(angle)));
+						p.setY(ellipse0->pos().y() + ellipse0->LALength() *
+							qSin(qDegreesToRadians(angle)));
+					}
+					ctrlPosList0 << p;
+				}
 			}
 			isBig0 = true;
 		}
 		ellipse0->SetProcessed();
-
+		
 		if (2 * ellipse1->LALength() <= Global::g_camViewField) {
-			c11.setX(ellipse1->pos().x());
-			c11.setY(ellipse1->pos().y());
+			QPointF p;
+			p.setX(ellipse1->pos().x());
+			p.setY(ellipse1->pos().y());
+			ctrlPosList1 << p;
 			isBig1 = false;
 		}
 		else {
-			if (ellipse1->SpanAngle() >= 360.0) {
-				c10.setX(ellipse1->pos().x());
-				c10.setY(ellipse1->pos().y() - ellipse1->SALength());
-				c11.setX(ellipse1->pos().x() + ellipse1->LALength() * qCos(qDegreesToRadians(30.0)));
-				c11.setY(ellipse1->pos().y() + ellipse1->SALength() / 2);
-				c12.setX(ellipse1->pos().x() - ellipse1->LALength() * qCos(qDegreesToRadians(30.0)));
-				c12.setY(c11.y());
+			double halfStepAngle = qRadiansToDegrees(qAsin(Global::g_camViewField / 2.0 /
+				ellipse1->LALength()));
+			if (ellipse1->SpanAngle() >= 360.0) {	// closed circle
+				double splitNo = qCeil(360.0 / halfStepAngle / 2.0) + 1;
+				double stepAngle = 360.0 / splitNo;
+				
+				for (int i = 0; i < splitNo; ++i) {
+					double angle = stepAngle*i + 0.0;
+					QPointF p;
+					p.setX(ellipse1->pos().x() + ellipse0->LALength() * qCos(qDegreesToRadians(angle)));
+					p.setY(ellipse1->pos().y() + ellipse0->LALength() * qSin(qDegreesToRadians(angle)));
+					ctrlPosList1 << p;
+				}
 			}
-			else {
-				c10.setX(ellipse1->pos().x() + ellipse1->LALength() *
-					qCos(qDegreesToRadians(ellipse1->StartAngle())));
-				c10.setY(ellipse1->pos().y() + ellipse1->SALength() *
-					qSin(qDegreesToRadians(ellipse1->StartAngle())));
-				c11.setX(ellipse1->pos().x() + ellipse1->LALength() *
-					qCos(qDegreesToRadians(ellipse1->StartAngle() + ellipse1->SpanAngle() / 2)));
-				c11.setY(ellipse1->pos().y() + ellipse1->SALength() *
-					qSin(qDegreesToRadians(ellipse1->StartAngle() + ellipse1->SpanAngle() / 2)));
-				c12.setX(ellipse1->pos().x() + ellipse1->LALength() *
-					qCos(qDegreesToRadians(ellipse1->EndAngle())));
-				c12.setY(ellipse1->pos().y() + ellipse1->SALength() *
-					qSin(qDegreesToRadians(ellipse1->EndAngle())));
+			else {		// open arc
+				double splitNo = qCeil(ellipse1->SpanAngle() / halfStepAngle / 2.0) + 1;
+				double stepAngle = ellipse1->SpanAngle() / splitNo;
+				
+				for (int i = 0; i < splitNo + 1; ++i) {
+					QPointF p;
+					if (0 == i) {
+						p.setX(ellipse1->pos().x() + ellipse1->LALength() *
+							qCos(qDegreesToRadians(ellipse1->StartAngle())));
+						p.setY(ellipse1->pos().y() + ellipse1->LALength() *
+							qSin(qDegreesToRadians(ellipse1->StartAngle())));
+					}
+					else if (splitNo == i) {
+						p.setX(ellipse1->pos().x() + ellipse1->LALength() *
+							qCos(qDegreesToRadians(ellipse1->EndAngle())));
+						p.setY(ellipse1->pos().y() + ellipse1->LALength() *
+							qSin(qDegreesToRadians(ellipse1->EndAngle())));
+					}
+					else {
+						double angle = ellipse1->StartAngle() + stepAngle*i;
+						p.setX(ellipse1->pos().x() + ellipse1->LALength() *
+							qCos(qDegreesToRadians(angle)));
+						p.setY(ellipse1->pos().y() + ellipse1->LALength() *
+							qSin(qDegreesToRadians(angle)));
+					}
+					ctrlPosList1 << p;
+				}
 			}
 			isBig1 = true;
 		}
@@ -629,79 +818,107 @@ void DxfPainter::SampleOfP2PDist()
 		CAMERAITEM ellipseItem;
 		if (isBig0 && isBig1) {
 			double d1, d2, d3, d4, min;
-			d1 = P_DISTANCE(c00, c10);
-			d2 = P_DISTANCE(c00, c12);
-			d3 = P_DISTANCE(c02, c10);
-			d4 = P_DISTANCE(c02, c12);
+			d1 = P_DISTANCE(ctrlPosList0.first(), ctrlPosList1.first());
+			d2 = P_DISTANCE(ctrlPosList0.first(), ctrlPosList1.last());
+			d3 = P_DISTANCE(ctrlPosList0.last(), ctrlPosList1.first());
+			d4 = P_DISTANCE(ctrlPosList0.last(), ctrlPosList1.last());
 			min = qMin(qMin(d1, d2), qMin(d3, d4));
-			if (min == d1) { ellipseItem.cadPos << c02 << c01 << c00 << c10 << c11 << c12; }
-			else if (min == d2) { ellipseItem.cadPos << c02 << c01 << c00 << c12 << c11 << c10; }
-			else if (min == d3) { ellipseItem.cadPos << c00 << c01 << c02 << c10 << c11 << c12; }
-			else { ellipseItem.cadPos << c00 << c01 << c02 << c12 << c11 << c10; }
+			if (min == d1) {
+				while (!ctrlPosList0.isEmpty()) { ellipseItem.cadPosList << ctrlPosList0.takeLast(); }
+				ellipseItem.cadPosList << ctrlPosList1;
+			}
+			else if (min == d2) {
+				while (!ctrlPosList0.isEmpty()) { ellipseItem.cadPosList << ctrlPosList0.takeLast(); }
+				while (!ctrlPosList1.isEmpty()) { ellipseItem.cadPosList << ctrlPosList1.takeLast(); }
+			}
+			else if (min == d3) {
+				ellipseItem.cadPosList << ctrlPosList0 << ctrlPosList1; }
+			else {
+				ellipseItem.cadPosList << ctrlPosList0;
+				while (!ctrlPosList1.isEmpty()) { ellipseItem.cadPosList << ctrlPosList1.takeLast(); }
+			}
 		}
 		if (isBig0 && !isBig1) {
 			double d1, d2, d3, d4, min;
-			d1 = P_DISTANCE(c00, c11);
-			d2 = P_DISTANCE(c02, c11);
-			if (d1 <= d2) { ellipseItem.cadPos << c02 << c01 << c00 << c11; }
-			else { ellipseItem.cadPos << c00 << c01 << c02 << c11; }
+			d1 = P_DISTANCE(ctrlPosList0.first(), ctrlPosList1.first());
+			d2 = P_DISTANCE(ctrlPosList0.last(), ctrlPosList1.first());
+			if (d1 <= d2) {
+				while (!ctrlPosList0.isEmpty()) { ellipseItem.cadPosList << ctrlPosList0.takeLast(); }
+				ellipseItem.cadPosList << ctrlPosList1; }
+			else { ellipseItem.cadPosList << ctrlPosList0 << ctrlPosList1; }
 		}
 		if (!isBig0 && isBig1) {
 			double d1, d2, d3, d4, min;
-			d1 = P_DISTANCE(c10, c00);
-			d2 = P_DISTANCE(c12, c00);
-			if (d1 <= d2) { ellipseItem.cadPos << c12 << c11 << c10 << c00; }
-			else { ellipseItem.cadPos << c10 << c11 << c12 << c00; }
+			d1 = P_DISTANCE(ctrlPosList1.first(), ctrlPosList0.first());
+			d2 = P_DISTANCE(ctrlPosList1.last(), ctrlPosList0.first());
+			if (d1 <= d2) {
+				while (!ctrlPosList1.isEmpty()) { ellipseItem.cadPosList << ctrlPosList1.takeLast(); }
+				ellipseItem.cadPosList << ctrlPosList0; }
+			else {
+				ellipseItem.cadPosList << ctrlPosList1 << ctrlPosList0; }
 		}
-		if (!isBig0 && !isBig1) { ellipseItem.cadPos << c00 << c11; }
+		if (!isBig0 && !isBig1) { ellipseItem.cadPosList << ctrlPosList0 << ctrlPosList1; }
 
 		ellipseItem.nType = MeasureType::P2PD;
-		ellipseItem.content = "Point-point distance";
-		ellipseItem.nCADHeight = 0;
-		Global::g_projectInfo.camearItems.append(ellipseItem);
+		Global::g_projectInfo.camItemList.append(ellipseItem);
 
 		emit NodeListTableUpdate();
 	}
 }
-/**
- * @brief	Point to line distance
- */
-void DxfPainter::SampleOfP2LDist()
+
+void DxfPainter::SampleTheP2LDist()
 {
-	QPointF c0, c1, c2, ls, le;
+	QVector<QPointF> ctrlPosList, lineCtrlPosList;
 	bool isBig;
+
 	Q_FOREACH(QGraphicsItem *item, m_dxfScene->selectedItems()) {
 		if (item->type() == DXF_ELLIPSE) {
 			DXFEllipseItem *ellipse = ELLIPSE_PTR_CAST(item);
 			if ((ellipse->LALength() != ellipse->SALength())) { return; }
 
 			if (2 * ellipse->LALength() <= Global::g_camViewField) {
-				c0.setX(ellipse->pos().x());
-				c0.setY(ellipse->pos().y());
+				QPointF p;
+				p.setX(ellipse->pos().x());
+				p.setY(ellipse->pos().y());
+				ctrlPosList << p;
 				isBig = false;
 			}
 			else {
-				if (ellipse->SpanAngle() >= 360.0) {		// closed circle
-					c0.setX(ellipse->pos().x());
-					c0.setY(ellipse->pos().y() - ellipse->SALength());
-					c1.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(30.0)));
-					c1.setY(ellipse->pos().y() + ellipse->SALength() / 2);
-					c2.setX(ellipse->pos().x() - ellipse->LALength() * qCos(qDegreesToRadians(30.0)));
-					c2.setY(c1.y());
+				double halfStepAngle = qRadiansToDegrees(qAsin(Global::g_camViewField / 2.0 /
+					ellipse->LALength()));
+				if (ellipse->SpanAngle() >= 360.0) {	// closed circle
+					double splitNo = qCeil(360.0 / halfStepAngle / 2.0) + 1;
+					double stepAngle = 360.0 / splitNo;
+
+					for (int i = 0; i < splitNo; ++i) {
+						double angle = stepAngle*i + 0.0;
+						QPointF p;
+						p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(angle)));
+						p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(angle)));
+						ctrlPosList << p;
+					}
 				}
 				else {		// open arc
-					c0.setX(ellipse->pos().x() + ellipse->LALength() *
-						qCos(qDegreesToRadians(ellipse->StartAngle())));
-					c0.setY(ellipse->pos().y() + ellipse->SALength() *
-						qSin(qDegreesToRadians(ellipse->StartAngle())));
-					c1.setX(ellipse->pos().x() + ellipse->LALength() *
-						qCos(qDegreesToRadians(ellipse->StartAngle() + ellipse->SpanAngle() / 2)));
-					c1.setY(ellipse->pos().y() + ellipse->SALength() *
-						qSin(qDegreesToRadians(ellipse->StartAngle() + ellipse->SpanAngle() / 2)));
-					c2.setX(ellipse->pos().x() + ellipse->LALength() *
-						qCos(qDegreesToRadians(ellipse->EndAngle())));
-					c2.setY(ellipse->pos().y() + ellipse->SALength() *
-						qSin(qDegreesToRadians(ellipse->EndAngle())));
+					double splitNo = qCeil(ellipse->SpanAngle() / halfStepAngle / 2.0) + 1;
+					double stepAngle = ellipse->SpanAngle() / splitNo;
+
+					for (int i = 0; i < splitNo + 1; ++i) {
+						QPointF p;
+						if (0 == i) {
+							p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(ellipse->StartAngle())));
+							p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(ellipse->StartAngle())));
+						}
+						else if (splitNo == i) {
+							p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(ellipse->EndAngle())));
+							p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(ellipse->EndAngle())));
+						}
+						else {
+							double angle = ellipse->StartAngle() + stepAngle*i;
+							p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(angle)));
+							p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(angle)));
+						}
+						ctrlPosList << p;
+					}
 				}
 				isBig = true;
 			}
@@ -709,8 +926,29 @@ void DxfPainter::SampleOfP2LDist()
 		}
 		else{
 			DXFPolylineItem *line = POLY_PTR_CAST(item);
+			QPointF ls, le;
 			ls = line->PolygonF().first();
 			le = line->PolygonF().last();
+
+			double d = P_DISTANCE(ls, le);
+			double length = qSqrt(d);
+
+			if (d <= Global::g_camViewField) {		// short
+				lineCtrlPosList << ls << le;
+			}
+			else {		// long
+				double slope = (le.y() - ls.y()) / (le.x() - ls.x());
+				int count = qCeil(length / Global::g_camViewField) + 1;
+				double deltaX = (le.x() - ls.x()) / count;
+
+				for (int i = 0; i < count + 1; ++i) {
+					double increase = (double)i * deltaX;
+					QPointF p;
+					p.setX(ls.x() + increase);
+					p.setY(ls.y() + increase*slope);
+					lineCtrlPosList << p;
+				}
+			}
 			line->SetProcessed();
 		}
 	}
@@ -718,196 +956,233 @@ void DxfPainter::SampleOfP2LDist()
 	CAMERAITEM item;
 	if (isBig) {
 		double d1, d2, d3, d4, min;
-		d1 = P_DISTANCE(c0, ls);
-		d2 = P_DISTANCE(c0, le);
-		d3 = P_DISTANCE(c2, ls);
-		d4 = P_DISTANCE(c2, le);
+		d1 = P_DISTANCE(ctrlPosList.first(), lineCtrlPosList.first());
+		d2 = P_DISTANCE(ctrlPosList.first(), lineCtrlPosList.last());
+		d3 = P_DISTANCE(ctrlPosList.last(), lineCtrlPosList.first());
+		d4 = P_DISTANCE(ctrlPosList.last(), lineCtrlPosList.last());
 		min = qMin(qMin(d1, d2), qMin(d3, d4));
-		if (min == d1) { item.cadPos << c2 << c1 << c0 << ls << le; }
-		else if (min == d2) { item.cadPos << c2 << c1 << c0 << le << ls; }
-		else if (min == d3) { item.cadPos << c0 << c1 << c2 << ls << le; }
-		else { item.cadPos << c0 << c1 << c2 << le << ls; }
+		if (min == d1) {
+			while (!ctrlPosList.isEmpty()) { item.cadPosList << ctrlPosList.takeLast(); }
+			item.cadPosList << lineCtrlPosList;
+		}
+		else if (min == d2) {
+			while (!ctrlPosList.isEmpty()) { item.cadPosList << ctrlPosList.takeLast(); }
+			while (!lineCtrlPosList.isEmpty()) { item.cadPosList << lineCtrlPosList.takeLast(); }
+		}
+		else if (min == d3) { item.cadPosList << ctrlPosList << lineCtrlPosList; }
+		else {
+			item.cadPosList << ctrlPosList;
+			while (!lineCtrlPosList.isEmpty()) { item.cadPosList << lineCtrlPosList.takeLast(); }
+		}
 	}
 	else {
 		double d1, d2, d3, d4, min;
-		d1 = P_DISTANCE(c0, ls);
-		d2 = P_DISTANCE(c0, le);
-		if (d1 <= d2) { item.cadPos << c0 << ls << le; }
-		else { item.cadPos << c0 << le << ls; }
+		d1 = P_DISTANCE(ctrlPosList.first(), lineCtrlPosList.first());
+		d2 = P_DISTANCE(ctrlPosList.first(), lineCtrlPosList.last());
+		if (d1 <= d2) { item.cadPosList << ctrlPosList << lineCtrlPosList; }
+		else {
+			item.cadPosList << ctrlPosList;
+			while (!lineCtrlPosList.isEmpty()) { item.cadPosList << lineCtrlPosList.takeLast(); }
+		}
 	}
 
 	item.nType = MeasureType::P2LD;
-	item.content = "Point-line distance";
-	item.nCADHeight= 0;
-	Global::g_projectInfo.camearItems.append(item);
+	Global::g_projectInfo.camItemList.append(item);
 
 	emit NodeListTableUpdate();
 }
-/**
- * @brief	Radius
- */
-void DxfPainter::SampleOfRadius()
+
+void DxfPainter::SampleTheRadius()
 {
 	DXFEllipseItem *ellipse = ELLIPSE_PTR_CAST(m_dxfScene->selectedItems().first());
 
 	if ((ellipse->LALength() != ellipse->SALength())) { return; }
-	QPointF c0, c1, c2;
-	bool isBig;
+	QVector<QPointF> ctrlPosList;
 
 	if (2 * ellipse->LALength() <= Global::g_camViewField) {
-		c0.setX(ellipse->pos().x());
-		c0.setY(ellipse->pos().y());
-		isBig = false;
+		QPointF p;
+		p.setX(ellipse->pos().x());
+		p.setY(ellipse->pos().y());
+		ctrlPosList << p;
 	}
 	else {
+		double halfStepAngle = qRadiansToDegrees(qAsin(Global::g_camViewField / 2.0 /
+			ellipse->LALength()));
 		if (ellipse->SpanAngle() >= 360.0) {	// closed circle
-			c0.setX(ellipse->pos().x());
-			c0.setY(ellipse->pos().y() - ellipse->SALength());
-			c1.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(30.0)));
-			c1.setY(ellipse->pos().y() + ellipse->SALength() / 2);
-			c2.setX(ellipse->pos().x() - ellipse->LALength() * qCos(qDegreesToRadians(30.0)));
-			c2.setY(c1.y());
+			double splitNo = qCeil(360.0 / halfStepAngle / 2.0) + 1;
+			double stepAngle = 360.0 / splitNo;
+
+			for (int i = 0; i < splitNo; ++i) {
+				double angle = stepAngle*i + 0.0;
+				QPointF p;
+				p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(angle)));
+				p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(angle)));
+				ctrlPosList << p;
+			}
 		}
 		else {		// open arc
-			c0.setX(ellipse->pos().x() + ellipse->LALength() *
-				qCos(qDegreesToRadians(ellipse->StartAngle())));
-			c0.setY(ellipse->pos().y() + ellipse->SALength() *
-				qSin(qDegreesToRadians(ellipse->StartAngle())));
-			c1.setX(ellipse->pos().x() + ellipse->LALength() *
-				qCos(qDegreesToRadians(ellipse->StartAngle() + ellipse->SpanAngle() / 2)));
-			c1.setY(ellipse->pos().y() + ellipse->SALength() *
-				qSin(qDegreesToRadians(ellipse->StartAngle() + ellipse->SpanAngle() / 2)));
-			c2.setX(ellipse->pos().x() + ellipse->LALength() *
-				qCos(qDegreesToRadians(ellipse->EndAngle())));
-			c2.setY(ellipse->pos().y() + ellipse->SALength() *
-				qSin(qDegreesToRadians(ellipse->EndAngle())));
+			double splitNo = qCeil(ellipse->SpanAngle() / halfStepAngle / 2.0) + 1;
+			double stepAngle = ellipse->SpanAngle() / splitNo;
+
+			for (int i = 0; i < splitNo+1; ++i) {
+				QPointF p;
+				if (0 == i) {
+					p.setX(ellipse->pos().x() + ellipse->LALength() *
+						qCos(qDegreesToRadians(ellipse->StartAngle())));
+					p.setY(ellipse->pos().y() + ellipse->LALength() *
+						qSin(qDegreesToRadians(ellipse->StartAngle())));
+				}
+				else if (splitNo == i) {
+					p.setX(ellipse->pos().x() + ellipse->LALength() *
+						qCos(qDegreesToRadians(ellipse->EndAngle())));
+					p.setY(ellipse->pos().y() + ellipse->LALength() *
+						qSin(qDegreesToRadians(ellipse->EndAngle())));
+				}
+				else {
+					double angle = ellipse->StartAngle() + stepAngle*i;
+					p.setX(ellipse->pos().x() + ellipse->LALength() *
+						qCos(qDegreesToRadians(angle)));
+					p.setY(ellipse->pos().y() + ellipse->LALength() *
+						qSin(qDegreesToRadians(angle)));
+				}
+				ctrlPosList << p;
+			}
 		}
-		isBig = true;
 	}
 	ellipse->SetProcessed();
 
 	CAMERAITEM ellipseItem;
-	if (isBig){ ellipseItem.cadPos << c0 << c1 << c2; }
-	else { ellipseItem.cadPos << c0; }
+	ellipseItem.cadPosList << ctrlPosList;
 
 	ellipseItem.nType = MeasureType::RAD;
-	ellipseItem.content = "Radius";
-	ellipseItem.nCADHeight = 0;
-	Global::g_projectInfo.camearItems.append(ellipseItem);
+	Global::g_projectInfo.camItemList.append(ellipseItem);
 
 	emit NodeListTableUpdate();
 }
-/**
- * @brief	Arc angle
- */
-void DxfPainter::SampleOfArcAngle()
+
+void DxfPainter::SampleTheArcAngle()
 {
 	DXFEllipseItem *ellipse = ELLIPSE_PTR_CAST(m_dxfScene->selectedItems().first());
 
 	if ((ellipse->LALength() != ellipse->SALength())) { return; }
-	QPointF c0, c1, c2;
-	bool isBig;
+	QVector<QPointF> ctrlPosList;
 
 	if (2 * ellipse->LALength() <= Global::g_camViewField) {
-		c0.setX(ellipse->pos().x());
-		c0.setY(ellipse->pos().y());
-		isBig = false;
+		QPointF p;
+		p.setX(ellipse->pos().x());
+		p.setY(ellipse->pos().y());
+		ctrlPosList << p;
 	}
 	else {
+		double halfStepAngle = qRadiansToDegrees(qAsin(Global::g_camViewField / 2.0 /
+			ellipse->LALength()));
 		if (ellipse->SpanAngle() >= 360.0) {	// closed circle
-			c0.setX(ellipse->pos().x());
-			c0.setY(ellipse->pos().y() - ellipse->SALength());
-			c1.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(30.0)));
-			c1.setY(ellipse->pos().y() + ellipse->SALength() / 2);
-			c2.setX(ellipse->pos().x() - ellipse->LALength() * qCos(qDegreesToRadians(30.0)));
-			c2.setY(c1.y());
+			double splitNo = qCeil(360.0 / halfStepAngle / 2.0) + 1;
+			double stepAngle = 360.0 / splitNo;
+
+			for (int i = 0; i < splitNo; ++i) {
+				double angle = stepAngle*i + 0.0;
+				QPointF p;
+				p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(angle)));
+				p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(angle)));
+				ctrlPosList << p;
+			}
 		}
 		else {		// open arc
-			c0.setX(ellipse->pos().x() + ellipse->LALength() *
-				qCos(qDegreesToRadians(ellipse->StartAngle())));
-			c0.setY(ellipse->pos().y() + ellipse->SALength() *
-				qSin(qDegreesToRadians(ellipse->StartAngle())));
-			c1.setX(ellipse->pos().x() + ellipse->LALength() *
-				qCos(qDegreesToRadians(ellipse->StartAngle() + ellipse->SpanAngle() / 2)));
-			c1.setY(ellipse->pos().y() + ellipse->SALength() *
-				qSin(qDegreesToRadians(ellipse->StartAngle() + ellipse->SpanAngle() / 2)));
-			c2.setX(ellipse->pos().x() + ellipse->LALength() *
-				qCos(qDegreesToRadians(ellipse->EndAngle())));
-			c2.setY(ellipse->pos().y() + ellipse->SALength() *
-				qSin(qDegreesToRadians(ellipse->EndAngle())));
+			double splitNo = qCeil(ellipse->SpanAngle() / halfStepAngle / 2.0) + 1;
+			double stepAngle = ellipse->SpanAngle() / splitNo;
+
+			for (int i = 0; i < splitNo + 1; ++i) {
+				QPointF p;
+				if (0 == i) {
+					p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(ellipse->StartAngle())));
+					p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(ellipse->StartAngle())));
+				}
+				else if (splitNo == i) {
+					p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(ellipse->EndAngle())));
+					p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(ellipse->EndAngle())));
+				}
+				else {
+					double angle = ellipse->StartAngle() + stepAngle*i;
+					p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(angle)));
+					p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(angle)));
+				}
+				ctrlPosList << p;
+			}
 		}
-		isBig = true;
 	}
 	ellipse->SetProcessed();
 
 	CAMERAITEM ellipseItem;
-	if (isBig) { ellipseItem.cadPos << c0 << c1 << c2; }
-	else { ellipseItem.cadPos << c0; }
+	ellipseItem.cadPosList << ctrlPosList;
 
 	ellipseItem.nType = MeasureType::AA;
-	ellipseItem.content = "Arc angle";
-	ellipseItem.nCADHeight = 0;
-	Global::g_projectInfo.camearItems.append(ellipseItem);
+	Global::g_projectInfo.camItemList.append(ellipseItem);
 
 	emit NodeListTableUpdate();
 }
-/**
- * @brief	Circular
- */
-void DxfPainter::SampleOfCircular()
+
+void DxfPainter::SampleTheCircular()
 {
 	DXFEllipseItem *ellipse = ELLIPSE_PTR_CAST(m_dxfScene->selectedItems().first());
 
 	if ((ellipse->LALength() != ellipse->SALength())) { return; }
-	QPointF c0, c1, c2;
-	bool isBig;
+	QVector<QPointF> ctrlPosList;
 
 	if (2 * ellipse->LALength() <= Global::g_camViewField) {
-		c0.setX(ellipse->pos().x());
-		c0.setY(ellipse->pos().y());
-		isBig = false;
+		QPointF p;
+		p.setX(ellipse->pos().x());
+		p.setY(ellipse->pos().y());
 	}
 	else {
+		double halfStepAngle = qRadiansToDegrees(qAsin(Global::g_camViewField / 2.0 /
+			ellipse->LALength()));
 		if (ellipse->SpanAngle() >= 360.0) {	// closed circle
-			c0.setX(ellipse->pos().x());
-			c0.setY(ellipse->pos().y() - ellipse->SALength());
-			c1.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(30.0)));
-			c1.setY(ellipse->pos().y() + ellipse->SALength() / 2);
-			c2.setX(ellipse->pos().x() - ellipse->LALength() * qCos(qDegreesToRadians(30.0)));
-			c2.setY(c1.y());
+			double splitNo = qCeil(360.0 / halfStepAngle / 2.0) + 1;
+			double stepAngle = 360.0 / splitNo;
+
+			for (int i = 0; i < splitNo; ++i) {
+				double angle = stepAngle*i + 0.0;
+				QPointF p;
+				p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(angle)));
+				p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(angle)));
+				ctrlPosList << p;
+			}
 		}
 		else {		// open arc
-			c0.setX(ellipse->pos().x() + ellipse->LALength() *
-				qCos(qDegreesToRadians(ellipse->StartAngle())));
-			c0.setY(ellipse->pos().y() + ellipse->SALength() *
-				qSin(qDegreesToRadians(ellipse->StartAngle())));
-			c1.setX(ellipse->pos().x() + ellipse->LALength() *
-				qCos(qDegreesToRadians(ellipse->StartAngle() + ellipse->SpanAngle() / 2)));
-			c1.setY(ellipse->pos().y() + ellipse->SALength() *
-				qSin(qDegreesToRadians(ellipse->StartAngle() + ellipse->SpanAngle() / 2)));
-			c2.setX(ellipse->pos().x() + ellipse->LALength() *
-				qCos(qDegreesToRadians(ellipse->EndAngle())));
-			c2.setY(ellipse->pos().y() + ellipse->SALength() *
-				qSin(qDegreesToRadians(ellipse->EndAngle())));
+			double splitNo = qCeil(ellipse->SpanAngle() / halfStepAngle / 2.0) + 1;
+			double stepAngle = ellipse->SpanAngle() / splitNo;
+
+			for (int i = 0; i < splitNo + 1; ++i) {
+				QPointF p;
+				if (0 == i) {
+					p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(ellipse->StartAngle())));
+					p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(ellipse->StartAngle())));
+				}
+				else if (splitNo == i) {
+					p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(ellipse->EndAngle())));
+					p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(ellipse->EndAngle())));
+				}
+				else {
+					double angle = ellipse->StartAngle() + stepAngle*i;
+					p.setX(ellipse->pos().x() + ellipse->LALength() * qCos(qDegreesToRadians(angle)));
+					p.setY(ellipse->pos().y() + ellipse->LALength() * qSin(qDegreesToRadians(angle)));
+				}
+				ctrlPosList << p;
+			}
 		}
-		isBig = true;
 	}
 	ellipse->SetProcessed();
 
 	CAMERAITEM ellipseItem;
-	if (isBig) { ellipseItem.cadPos << c0 << c1 << c2; }
-	else { ellipseItem.cadPos << c0; }
+	ellipseItem.cadPosList << ctrlPosList;
 
 	ellipseItem.nType = MeasureType::CIC;
-	ellipseItem.content = "Circular";
-	ellipseItem.nCADHeight = 0;
-	Global::g_projectInfo.camearItems.append(ellipseItem);
+	Global::g_projectInfo.camItemList.append(ellipseItem);
 
 	emit NodeListTableUpdate();
 }
-/**
- * @brief	Line length
- */
+
 void DxfPainter::SampleOfLength()
 {
 	DXFPolylineItem *line = POLY_PTR_CAST(m_dxfScene->selectedItems().first());
@@ -915,22 +1190,33 @@ void DxfPainter::SampleOfLength()
 	QPointF ls, le;
 	ls = line->PolygonF().first();
 	le = line->PolygonF().last();
-	line->SetProcessed();
+	double d = P_DISTANCE(ls, le);
+	double length = qSqrt(d);
 
 	CAMERAITEM lineItem;
-	lineItem.cadPos << ls << le;
+	if (d <= Global::g_camViewField) { lineItem.cadPosList << ls << le; }
+	else {
+		double slope = (le.y() - ls.y()) / (le.x() - ls.x());
+		int count = qCeil(length / Global::g_camViewField) + 1;
+		double deltaX = (le.x() - ls.x()) / count;
+
+		for (int i = 0; i < count + 1; ++i) {
+			double increase = (double)i * deltaX;
+			QPointF p;
+			p.setX(ls.x() + increase);
+			p.setY(ls.y() + increase*slope);
+			lineItem.cadPosList << p;
+		}
+	}
+	line->SetProcessed();
 
 	lineItem.nType = MeasureType::LEN;
-	lineItem.content = "Length";
-	lineItem.nCADHeight = 0;
-	Global::g_projectInfo.camearItems.append(lineItem);
+	Global::g_projectInfo.camItemList.append(lineItem);
 
 	emit NodeListTableUpdate();
 }
-/**
- * @brief	Straightness
- */
-void DxfPainter::SampleOfStraightness()
+
+void DxfPainter::SampleTheStraightness()
 {
 	DXFPolylineItem *line = POLY_PTR_CAST(m_dxfScene->selectedItems().first());
 
@@ -941,43 +1227,38 @@ void DxfPainter::SampleOfStraightness()
 	double length = qSqrt(d);
 	
 	CAMERAITEM lineItem;
-	if (d <= Global::g_camViewField){ lineItem.cadPos << ls << le; }
+	if (d <= Global::g_camViewField){ lineItem.cadPosList << ls << le; }
 	else {
 		double slope = (le.y() - ls.y()) / (le.x() - ls.x());
-		int count = qCeil(length / Global::g_camViewField );
+		int count = qCeil(length / Global::g_camViewField ) + 1;
 		double deltaX = (le.x() - ls.x())/ count;
+
 		for (int i = 0; i < count + 1; ++i) {
 			double increase = (double)i * deltaX;
 			QPointF p;
 			p.setX(ls.x() + increase);
 			p.setY(ls.y() + increase*slope);
-			lineItem.cadPos << p;
+			lineItem.cadPosList << p;
 		}
 	}
 	line->SetProcessed();
 
-	lineItem.nType = MeasureType::LEN;
-	lineItem.content = "Straightness";
-	lineItem.nCADHeight = 0;
-	Global::g_projectInfo.camearItems.append(lineItem);
+	lineItem.nType = MeasureType::STN;
+	Global::g_projectInfo.camItemList.append(lineItem);
 
 	emit NodeListTableUpdate();
 }
-/**
- * @brief	Height
- */
-void DxfPainter::SampleOfHeight()
+
+void DxfPainter::SampleTheHeight()
 {
 	LASERITEM laserItem;
 	Q_FOREACH(QGraphicsItem *item, m_dxfScene->selectedItems()) {
 		MARK_PTR_CAST(item)->SetProcessed();
-		laserItem.cadPos.append(item->pos());
+		laserItem.cadPosList.append(item->pos());
 	}
 
 	laserItem.nType = MeasureType::FTN;
-	laserItem.content = "Height";
-	laserItem.nCADHeight = 0;
-	Global::g_projectInfo.laserItems.append(laserItem);
+	Global::g_projectInfo.laserItemList.append(laserItem);
 
 	emit NodeListTableUpdate();
 }

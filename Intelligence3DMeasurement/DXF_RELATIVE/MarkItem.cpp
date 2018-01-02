@@ -1,9 +1,10 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
+#include <Qdebug>
 #include "MarkItem.h"
 
 
-MarkItem::MarkItem(int morph) : m_size(3.6), m_hasProcessed(false)
+MarkItem::MarkItem(int morph, double size) : m_size(size), m_hasProcessed(false)
 {
 	if (0 == morph) {
 		setZValue(5);
@@ -42,19 +43,24 @@ void MarkItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
 	Q_UNUSED(widget);
 
 	if (0 == m_morph) {
-		painter->setPen(QPen(Qt::red, 0.3));
-		painter->drawLine(QPoint(-m_size / 2.0, -m_size / 2.0), QPoint(m_size / 2.0, m_size / 2.0));
-		painter->drawLine(QPoint(-m_size / 2.0, m_size / 2.0), QPoint(m_size / 2.0, -m_size / 2.0));
+		painter->setPen(QPen(Qt::yellow, 0.2));
+		painter->drawLine(QPoint(-3.6 / 2.0, -3.6 / 2.0), QPoint(3.6 / 2.0, 3.6 / 2.0));
+		painter->drawLine(QPoint(3.6 / 2.0, -3.6 / 2.0), QPoint(-3.6 / 2.0, 3.6 / 2.0));
+		painter->setPen(QPen(Qt::red, 0.2));
+		painter->drawLine(QPoint(-m_size / 2.0, -m_size / 2.0), QPoint(m_size / 2.0, -m_size / 2.0));
+		painter->drawLine(QPoint(m_size / 2.0, -m_size / 2.0), QPoint(m_size / 2.0, m_size / 2.0));
+		painter->drawLine(QPoint(m_size / 2.0, m_size / 2.0), QPoint(-m_size / 2.0, m_size / 2.0));
+		painter->drawLine(QPoint(-m_size / 2.0, m_size / 2.0), QPoint(-m_size / 2.0, -m_size / 2.0));
 	}
 	else if (1 == m_morph) {
-		QPen p(QPen(Qt::yellow, 0.3));
+		QPen p(QPen(Qt::yellow, 0.2));
 		if (m_hasProcessed) {
 			p.setColor(QColor(35, 255, 0));
-			p.setWidthF(0.3);
+			p.setWidthF(0.2);
 		}
 		else if (option->state & QStyle::State_Selected) {
 			p.setColor(Qt::red);
-			p.setWidthF(0.3);
+			p.setWidthF(0.2);
 		}
 
 		painter->setPen(p);

@@ -11,7 +11,7 @@ class MarkItem : public QGraphicsItem
 {
 
 public:
-	MarkItem(int morph = 0);
+	MarkItem(int morph = 0, double size = 3.6);
 	enum { Type = DXF_MARK };
 	int type() const Q_DECL_OVERRIDE;
 

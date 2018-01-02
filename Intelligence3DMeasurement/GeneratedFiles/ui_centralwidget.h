@@ -150,7 +150,7 @@ public:
         stopBtn->setToolTip(QApplication::translate("CentralWidget", "<html><head/><body><p>\345\201\234\346\255\242\345\275\223\345\211\215\350\277\233\345\272\246</p></body></html>", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
         stopBtn->setText(QApplication::translate("CentralWidget", "\345\201\234\346\255\242", Q_NULLPTR));
-        startBtn->setText(QApplication::translate("CentralWidget", "\345\274\200\345\247\213", Q_NULLPTR));
+        startBtn->setText(QApplication::translate("CentralWidget", "\345\274\200\345\247\213\357\274\2100\357\274\211", Q_NULLPTR));
         cameraCtrlBtn->setText(QApplication::translate("CentralWidget", "\347\233\270\346\234\272\346\216\247\345\210\266", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
         projectItemsView->setToolTip(QApplication::translate("CentralWidget", "\346\226\271\346\241\210\350\257\246\346\203\205", Q_NULLPTR));

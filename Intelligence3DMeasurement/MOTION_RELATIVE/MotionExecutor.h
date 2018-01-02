@@ -13,14 +13,15 @@ private:
 	void BiasCorrectionXY(double &dx, double &dy);
 	void BiasCorrectionZ(double &dz);
 	void Coordinator(double dx, double dy, double dz, double &lastHeight);
+	void HomeReturn(bool f);
 	void Camera(int itemIndex);
-	void ReturnControl(bool f);
+	void Laser(int itemIndex);
 
 protected:
 	void run() Q_DECL_OVERRIDE;
 
 signals:
-	void ShowCurrent();
+	void ShowCurPhoto();
 	void LaserRequire(int);
 
 private slots:

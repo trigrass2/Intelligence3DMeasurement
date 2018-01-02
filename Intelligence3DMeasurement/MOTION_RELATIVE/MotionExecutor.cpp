@@ -20,13 +20,13 @@ void MotionExecutor::BiasCorrectionZ(double &dz)
 /**
  * @brief	Coordinator
  *
- * 算法设计：当前高度需要提升时，先（绝对）移动Z轴；反之，后（绝对）移动Z轴
+ * 根据高度上下文控制Z轴
  */
 void MotionExecutor::Coordinator(double dx, double dy, double dz, double &lastHeight)
 {
 	long pdx, pdy, pdz;
 	if (dz - lastHeight > 0) {
-		qDebug() << "	[Height]Adjusting to " << dz;
+		qDebug() << "	[Height]adjusting to " << dz;
 		pdz = dz / Global::g_pulseEquivalent;
 		if (ENABLE_MOTION_MODULE) {
 			dmc_pmove(0, 2, pdz, 1);
@@ -37,10 +37,10 @@ void MotionExecutor::Coordinator(double dx, double dy, double dz, double &lastHe
 				}
 				qApp->processEvents();
 			}
-			qDebug() << "	->Done.";
+			qDebug() << "	->Done";
 		}
 
-		qDebug() << "	[XY]Moving to " << "(" << dx << ", " << dy << ")";
+		qDebug() << "	[XY]moving to " << "(" << dx << ", " << dy << ")";
 		pdx = dx / Global::g_pulseEquivalent;
 		pdy = dy / Global::g_pulseEquivalent;
 		if (ENABLE_MOTION_MODULE) {
@@ -52,11 +52,11 @@ void MotionExecutor::Coordinator(double dx, double dy, double dz, double &lastHe
 				}
 				qApp->processEvents();
 			}
-			qDebug() << "	->Done.";
+			qDebug() << "	->Done";
 		}
 	}
 	else if(dz - lastHeight < 0) {
-		qDebug() << "	[XY]Moving to " << "(" << dx << ", " << dy << ")";
+		qDebug() << "	[XY]moving to " << "(" << dx << ", " << dy << ")";
 		pdx = dx / Global::g_pulseEquivalent;
 		pdy = dy / Global::g_pulseEquivalent;
 		if (ENABLE_MOTION_MODULE) {
@@ -68,10 +68,10 @@ void MotionExecutor::Coordinator(double dx, double dy, double dz, double &lastHe
 				}
 				qApp->processEvents();
 			}
-			qDebug() << "	->Done.";
+			qDebug() << "	->Done";
 		}
 
-		qDebug() << "	[Height]Adjusting to " << dz;
+		qDebug() << "	[Height]adjusting to " << dz;
 		pdz = dz / Global::g_pulseEquivalent;
 		if (ENABLE_MOTION_MODULE) {
 			dmc_pmove(0, 2, pdz, 1);
@@ -82,11 +82,11 @@ void MotionExecutor::Coordinator(double dx, double dy, double dz, double &lastHe
 				}
 				qApp->processEvents();
 			}
-			qDebug() << "	->Done.";
+			qDebug() << "	->Done";
 		}
 	}
 	else {
-		qDebug() << "	[XY]Moving to " << "(" << dx << ", " << dy << ")";
+		qDebug() << "	[XY]moving to " << "(" << dx << ", " << dy << ")";
 		pdx = dx / Global::g_pulseEquivalent;
 		pdy = dy / Global::g_pulseEquivalent;
 		if (ENABLE_MOTION_MODULE) {
@@ -98,32 +98,13 @@ void MotionExecutor::Coordinator(double dx, double dy, double dz, double &lastHe
 				}
 				qApp->processEvents();
 			}
-			qDebug() << "	->Done.";
+			qDebug() << "	->Done";
 		}
 	}
 	lastHeight = dz;
 }
 
-void MotionExecutor::Camera(int itemIndex)
-{
-	qDebug() << "	[Camera]capturing@item(" << itemIndex << ")";
-	if (ENABLE_MOTION_MODULE) {
-		long x = dmc_get_encoder(0, 0);
-		long y = dmc_get_encoder(0, 1);
-		if (ENABLE_VISION_MODULE) {
-			Sleep(100);		// wait for tatally stop
-
-			GrabImage(&Global::g_image, Global::AcqHandle);
-			emit ShowCurrent();
-
-			QString key = QString::number(itemIndex) + "_" + QString::number(x) + "_" + QString::number(y);
-			Global::halconData.insert(key, Global::g_image);
-			qDebug() << "	->Done.";
-		}
-	}
-}
-
-void MotionExecutor::ReturnControl(bool f)
+void MotionExecutor::HomeReturn(bool f)
 {
 	if (f) {
 		if (ENABLE_MOTION_MODULE) {
@@ -134,10 +115,10 @@ void MotionExecutor::ReturnControl(bool f)
 			dmc_set_encoder(0, 1, 0);
 			dmc_set_encoder(0, 2, 0);
 		}
-		qDebug() << "Setup relative ORG.";
+		qDebug() << "Setup relative home.";
 	}
 	else {
-		qDebug() << "Returning to relative ORG.";
+		qDebug() << "Returning to relative home.";
 		if (ENABLE_MOTION_MODULE) {
 			// Z轴回原
 			dmc_home_move(0, 2);
@@ -181,10 +162,42 @@ void MotionExecutor::ReturnControl(bool f)
 	}
 }
 
+void MotionExecutor::Camera(int itemIndex)
+{
+	qDebug() << "	[Camera]capturing item@" << itemIndex;
+	if (ENABLE_MOTION_MODULE) {
+		Sleep(100);		// wait for stop
+		long x = dmc_get_encoder(0, 0);
+		long y = dmc_get_encoder(0, 1);
+		if (ENABLE_VISION_MODULE) {
+			GrabImage(&Global::g_curPhoto, Global::acqHandle);
+			Global::g_projectInfo.camItemList[itemIndex].feedbackPosList << QPoint(x, y);
+			Global::g_projectInfo.camItemList[itemIndex].sampleData << Global::g_curPhoto;
+			emit ShowCurPhoto();
+			qDebug() << "	->Done";
+		}
+	}
+}
+
+void MotionExecutor::Laser(int itemIndex)
+{
+	qDebug() << "	[Laser]sampling item@" << itemIndex;
+	if (ENABLE_MOTION_MODULE) {
+		Sleep(100);
+		long x = dmc_get_encoder(0, 0);
+		long y = dmc_get_encoder(0, 1);
+		if (ENABLE_VISION_MODULE) {
+			Global::g_projectInfo.laserItemList[itemIndex].feedbackPosList << QPoint(x, y);
+			emit LaserRequire(itemIndex);
+			Sleep(50);		// wait for read
+			qDebug() << "	->Done";
+		}
+	}
+}
+
 void MotionExecutor::run()
 {
 	qDebug() << "#######Start#######";
-
 	if (ENABLE_MOTION_MODULE) {
 		dmc_set_vector_profile_multicoor(0, 0, 0, Global::g_xyLineVectorVel, 0.01, 0.01);
 		dmc_set_profile(0, 0, 0, Global::g_zVel, 0.01, 0.01, 0);
@@ -192,52 +205,51 @@ void MotionExecutor::run()
 		dmc_set_profile(0, 2, 0, Global::g_zVel, 0.01, 0.01, 0);
 	}
 
-	ReturnControl(!m_break);
+	HomeReturn(!m_break);
 
-	double x0 = Global::g_projectInfo.startPoint.x();
-	double y0 = Global::g_projectInfo.startPoint.y();
+	double x0 = Global::g_projectInfo.startCADPos.x();
+	double y0 = Global::g_projectInfo.startCADPos.y();
 	double height = 0;
 
-	qDebug() << "Enter camera area.";
-	Q_FOREACH(int sqc, Global::g_projectInfo.camSequence) {
+	qDebug() << "Enter vision measure area.";
+	Q_FOREACH(int index, Global::g_projectInfo.camMeasurePath) {
 		double dx, dy, dz;
-		if (Global::g_projectInfo.camearItems[sqc].bIsInverted) {
-			dz = Global::g_projectInfo.camearItems[sqc].nCADHeight;
-			for (int i = Global::g_projectInfo.camearItems[sqc].cadPos.count() - 1; i >= 0; --i) {
-				dx = Global::g_projectInfo.camearItems[sqc].cadPos[i].x() - x0;
-				dy = Global::g_projectInfo.camearItems[sqc].cadPos[i].y() - y0;
+		if (Global::g_projectInfo.camItemList[index].bPosListInverted) {
+			dz = Global::g_projectInfo.camItemList[index].nCADHeight;
+			for (int i = Global::g_projectInfo.camItemList[index].cadPosList.count() - 1; i >= 0; --i) {
+				dx = Global::g_projectInfo.camItemList[index].cadPosList[i].x() - x0;
+				dy = Global::g_projectInfo.camItemList[index].cadPosList[i].y() - y0;
 				Coordinator(dx, dy, dz, height);
-				Camera(sqc);
+				Camera(index);
+				
 			}
-			Global::g_projectInfo.camearItems[sqc].nTemp = 9999;	// 完成标识
+			Global::g_projectInfo.camItemList[index].nTemp = 9999;	// processed
 		}
 		else {
-			for (int i = 0; i < Global::g_projectInfo.camearItems[sqc].cadPos.count(); ++i) {
-				dx = Global::g_projectInfo.camearItems[sqc].cadPos[i].x() - x0;
-				dy = Global::g_projectInfo.camearItems[sqc].cadPos[i].y() - y0;
-				dz = Global::g_projectInfo.camearItems[sqc].nCADHeight;
+			for (int i = 0; i < Global::g_projectInfo.camItemList[index].cadPosList.count(); ++i) {
+				dx = Global::g_projectInfo.camItemList[index].cadPosList[i].x() - x0;
+				dy = Global::g_projectInfo.camItemList[index].cadPosList[i].y() - y0;
+				dz = Global::g_projectInfo.camItemList[index].nCADHeight;
 				Coordinator(dx, dy, dz, height);
-				Camera(sqc);
+				Camera(index);
 			}
-			Global::g_projectInfo.camearItems[sqc].nTemp = 9999;
+			Global::g_projectInfo.camItemList[index].nTemp = 9999;
 		}
 	}
 
-	qDebug() << "Enter laser area.";
-	for (int index = 0; index < Global::g_projectInfo.laserItems.count(); ++index) {
-		double dx, dy, dz = Global::g_projectInfo.laserItems[index].nCADHeight;
+	qDebug() << "Enter laser mesure area.";
+	for (int index = 0; index < Global::g_projectInfo.laserItemList.count(); ++index) {
+		double dx, dy, dz = Global::g_projectInfo.laserItemList[index].nCADHeight;
 		BiasCorrectionZ(dz);
-		Global::g_projectInfo.laserItems[index].directReading.clear();
-		for (int i = 0; i < Global::g_projectInfo.laserItems[index].cadPos.count(); ++i) {
-			dx = Global::g_projectInfo.laserItems[index].cadPos[i].x() - x0;
-			dy = Global::g_projectInfo.laserItems[index].cadPos[i].y() - y0;
+		for (int i = 0; i < Global::g_projectInfo.laserItemList[index].cadPosList.count(); ++i) {
+			dx = Global::g_projectInfo.laserItemList[index].cadPosList[i].x() - x0;
+			dy = Global::g_projectInfo.laserItemList[index].cadPosList[i].y() - y0;
 			BiasCorrectionXY(dx, dy);
 			Coordinator(dx, dy, dz, height);
-			emit LaserRequire(index);
-			Sleep(10);
+			Laser(index);
 		}
 	}
 
-	if (!m_break){ ReturnControl(false); }
+	if (!m_break){ HomeReturn(false); }
 	qDebug() << "#######Finish#######";
 }

@@ -54,12 +54,13 @@ void Laser::LaserProc()
 	//	la.measure.clear();
 	//}
 
-	Q_FOREACH(LASERITEM la, Global::g_projectInfo.laserItems) {
-		qSort(la.directReading.begin(), la.directReading.end());
-		qDebug() << la.directReading;
-		double finalF = qAbs(la.directReading.last() - la.directReading.first());
+	Q_FOREACH(LASERITEM la, Global::g_projectInfo.laserItemList) {
+		qSort(la.sampleData.begin(), la.sampleData.end());
+		qDebug() << la.sampleData;
+		double finalF = qAbs(la.sampleData.last() - la.sampleData.first());
+		la.processedData[Global::g_projectInfo.nSubGroupSize - Global::IndexGen(false)] = finalF;
 		qDebug() << "Faltness=" << finalF;
-		la.directReading.clear();
+		la.sampleData.clear();
 	}
 
 	emit LaserProcessDone();

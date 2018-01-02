@@ -44,13 +44,12 @@ ProcessTypeCfgDlg::ProcessTypeCfgDlg(QWidget *parent)
 
 void ProcessTypeCfgDlg::showEvent(QShowEvent *e)
 {
-	qDebug() << Global::g_isLocked;
-	if (Global::g_isLocked) {
-		ui.subGroupVolSlider->setDisabled(Global::g_isLocked);
-		ui.subGroupVolSlider->setValue(Global::g_projectInfo.nSubGroup);
+	if (Global::g_lockConfig) {
+		ui.subGroupVolSlider->setDisabled(Global::g_lockConfig);
+		ui.subGroupVolSlider->setValue(Global::g_projectInfo.nSubGroupSize);
 	}
 	else {
-		ui.subGroupVolSlider->setDisabled(Global::g_isLocked);
+		ui.subGroupVolSlider->setDisabled(Global::g_lockConfig);
 		ui.subGroupVolSlider->setValue(1);
 	}
 }
@@ -65,7 +64,7 @@ void ProcessTypeCfgDlg::closeEvent(QCloseEvent *e)
 
 void ProcessTypeCfgDlg::SyncMem()
 {
-	Global::g_projectInfo.nSubGroup = ui.subGroupVolSlider->value();
+	Global::g_projectInfo.nSubGroupSize = ui.subGroupVolSlider->value();
 	Global::g_enable2DMode = ui.xyMeasureBtn->isChecked();
 	Global::g_enableQuietMode = ui.autoSaveBtn->isChecked();
 	Global::g_camViewField = ui.viewField->value();

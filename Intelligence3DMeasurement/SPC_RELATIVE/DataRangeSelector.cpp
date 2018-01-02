@@ -1,4 +1,3 @@
-#include <QDebug>
 #include "DataRangeSelector.h"
 
 #include "Global.h"

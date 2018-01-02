@@ -44,7 +44,7 @@ CentralWidget::CentralWidget(QWidget *parent)
 
 	executor = new MotionExecutor;
 	connect(executor, SIGNAL(finished()), visionModule, SLOT(ImgProc()));
-	connect(executor, SIGNAL(ShowCurrent()), this, SLOT(ShowPhoto()));
+	connect(executor, SIGNAL(ShowCurPhoto()), this, SLOT(ShowPhoto()));
 	connect(executor, SIGNAL(LaserRequire(int)), this, SIGNAL(LaserRequire2(int)));
 	connect(ui.stopBtn, SIGNAL(clicked()), executor, SLOT(Stop()));
 
@@ -62,8 +62,8 @@ CentralWidget::CentralWidget(QWidget *parent)
 void CentralWidget::ShowPhoto()
 {
 	if (ENABLE_VISION_MODULE) {
-		if (Global::g_enableCamCtrl) { GrabImage(&Global::g_image, Global::AcqHandle); }
-		DispObj(Global::g_image, Global::hv_window);
+		if (Global::g_enableCamCtrl) { GrabImage(&Global::g_curPhoto, Global::acqHandle); }
+		DispObj(Global::g_curPhoto, Global::hv_window);
 		DispCross(Global::hv_window, 972, 1296, 500, 0);
 	}
 }
@@ -76,31 +76,31 @@ void CentralWidget::on_cameraCtrlBtn_clicked()
 void CentralWidget::UpdateNodeListTable()
 {
 	projectItemsModel->removeRows(0, projectItemsModel->rowCount());
-	for (int i = 0; i<Global::g_projectInfo.camearItems.count(); ++i) {
+	for (int i = 0; i<Global::g_projectInfo.camItemList.count(); ++i) {
 		projectItemsModel->setItem(i, 0, new QStandardItem(
-			Global::g_projectInfo.camearItems.at(i).content));
+			Global::g_projectInfo.camItemList.at(i).content));
 		projectItemsModel->setItem(i, 1, new QStandardItem(QString::number(
-			Global::g_projectInfo.camearItems.at(i).nCADHeight)));
+			Global::g_projectInfo.camItemList.at(i).nCADHeight)));
 		projectItemsModel->setItem(i, 2, new QStandardItem(QString::number(
-			Global::g_projectInfo.camearItems.at(i).dStandard)));
+			Global::g_projectInfo.camItemList.at(i).dStandardD)));
 		projectItemsModel->setItem(i, 3, new QStandardItem(QString::number(
-			Global::g_projectInfo.camearItems.at(i).dUpper)));
+			Global::g_projectInfo.camItemList.at(i).dUpperD)));
 		projectItemsModel->setItem(i, 4, new QStandardItem(QString::number(
-			Global::g_projectInfo.camearItems.at(i).dLower)));
+			Global::g_projectInfo.camItemList.at(i).dLowerD)));
 	}
 
 	int bias = projectItemsModel->rowCount();
-	for (int i = 0; i<Global::g_projectInfo.laserItems.count(); ++i) {
+	for (int i = 0; i<Global::g_projectInfo.laserItemList.count(); ++i) {
 		projectItemsModel->setItem(i + bias, 0, new QStandardItem(
-			Global::g_projectInfo.laserItems.at(i).content));
+			Global::g_projectInfo.laserItemList.at(i).content));
 		projectItemsModel->setItem(i + bias, 1, new QStandardItem(QString::number(
-			Global::g_projectInfo.laserItems.at(i).nCADHeight)));
+			Global::g_projectInfo.laserItemList.at(i).nCADHeight)));
 		projectItemsModel->setItem(i + bias, 2, new QStandardItem(QString::number(
-			Global::g_projectInfo.laserItems.at(i).dStandard)));
+			Global::g_projectInfo.laserItemList.at(i).dStandardD)));
 		projectItemsModel->setItem(i + bias, 3, new QStandardItem(QString::number(
-			Global::g_projectInfo.laserItems.at(i).dUpper)));
+			Global::g_projectInfo.laserItemList.at(i).dUpperD)));
 		projectItemsModel->setItem(i + bias, 4, new QStandardItem(QString::number(
-			Global::g_projectInfo.laserItems.at(i).dLower)));
+			Global::g_projectInfo.laserItemList.at(i).dLowerD)));
 	}
 
 	QString toolTip;
@@ -134,7 +134,7 @@ void CentralWidget::on_replanBtn_clicked()
 {
 	projectItemsModel->removeRows(0, projectItemsModel->rowCount());
 	ui.projectItemsView->setToolTip("方案详情");
-	Global::g_isLocked = false;
+	Global::g_lockConfig = false;
 }
 
 void CentralWidget::on_loadBtn_clicked()
@@ -145,7 +145,7 @@ void CentralWidget::on_loadBtn_clicked()
 		// Load
 		QSettings prjFile(prj, QSettings::IniFormat);
 		Global::g_projectInfo.projectName = prjFile.value("OVERRALL/ProjectName").toString();
-		Global::g_projectInfo.cadFile = prjFile.value("OVERRALL/CAD").toString();
+		Global::g_projectInfo.cadFileName = prjFile.value("OVERRALL/CADFileName").toString();
 		Global::g_projectInfo.partName = prjFile.value("OVERRALL/PartName").toString();
 		Global::g_projectInfo.productModel = prjFile.value("OVERRALL/ProductModel").toString();
 		Global::g_projectInfo.orderNumber = prjFile.value("OVERRALL/OrderNumber").toString();
@@ -153,76 +153,80 @@ void CentralWidget::on_loadBtn_clicked()
 		Global::g_projectInfo.productionDate = prjFile.value("OVERRALL/ProductionDate").toString();
 		Global::g_projectInfo.processName = prjFile.value("OVERRALL/ProcessName").toString();
 		Global::g_projectInfo.station = prjFile.value("OVERRALL/Station").toString();
-		int size = prjFile.beginReadArray("OVERRALL/CameraSequence");
-		Global::g_projectInfo.camSequence.clear();
+		int size = prjFile.beginReadArray("OVERRALL/CameraMeasurePath");
+		Global::g_projectInfo.camMeasurePath.clear();
 		for (int i = 0; i < size; ++i) {
 			prjFile.setArrayIndex(i);
-			Global::g_projectInfo.camSequence.append(prjFile.value("idx").toInt());
+			Global::g_projectInfo.camMeasurePath.append(prjFile.value("idx").toInt());
 		}
 		prjFile.endArray();
-		size = prjFile.beginReadArray("OVERRALL/CameraItem");
-		Global::g_projectInfo.camearItems.clear();
+		size = prjFile.beginReadArray("OVERRALL/CameraItemList");
+		Global::g_projectInfo.camItemList.clear();
 		for (int i = 0; i < size; ++i) {
 			prjFile.setArrayIndex(i);
 			CAMERAITEM item;
-			int size2 = prjFile.beginReadArray("OVERRALL/CameraItem/Node");
+			int size2 = prjFile.beginReadArray("OVERRALL/CameraItemList/CADPosList");
 			for (int j = 0; j < size2; ++j) {
 				prjFile.setArrayIndex(j);
-				item.cadPos.append(prjFile.value("_p").toPointF());
+				item.cadPosList.append(prjFile.value("_p").toPointF());
 			}
 			prjFile.endArray();
-			item.bIsInverted = prjFile.value("invert").toBool();
+			item.bPosListInverted = prjFile.value("invert").toBool();
 			item.nType = prjFile.value("type").toInt();
 			item.content = prjFile.value("content").toString();
 			item.nCADHeight = prjFile.value("height").toInt();
-			item.dStandard = prjFile.value("standard").toDouble();
-			item.dUpper = prjFile.value("upper").toDouble();
-			item.dLower = prjFile.value("lower").toDouble();
-			Global::g_projectInfo.camearItems.append(item);
+			item.dStandardD = prjFile.value("standard").toDouble();
+			item.dUpperD = prjFile.value("upper").toDouble();
+			item.dLowerD = prjFile.value("lower").toDouble();
+			Global::g_projectInfo.camItemList.append(item);
 		}
 		prjFile.endArray();
-		size = prjFile.beginReadArray("OVERRALL/LaserItem");
-		Global::g_projectInfo.laserItems.clear();
+		size = prjFile.beginReadArray("OVERRALL/LaserItemList");
+		Global::g_projectInfo.laserItemList.clear();
 		for (int i = 0; i < size; ++i) {
 			prjFile.setArrayIndex(i);
 			LASERITEM item;
-			int size2 = prjFile.beginReadArray("OVERRALL/LaserItem/Node");
+			int size2 = prjFile.beginReadArray("OVERRALL/LaserItemList/CADPosList");
 			for (int j = 0; j < size2; ++j) {
 				prjFile.setArrayIndex(j);
-				item.cadPos.append(prjFile.value("_p").toPointF());
+				item.cadPosList.append(prjFile.value("_p").toPointF());
 			}
 			prjFile.endArray();
 			item.content = prjFile.value("content").toString();
 			item.nCADHeight = prjFile.value("height").toInt();
-			item.dStandard = prjFile.value("standard").toDouble();
-			item.dUpper = prjFile.value("upper").toDouble();
-			item.dLower = prjFile.value("lower").toDouble();
-			Global::g_projectInfo.laserItems.append(item);
+			item.dStandardD = prjFile.value("standard").toDouble();
+			item.dUpperD = prjFile.value("upper").toDouble();
+			item.dLowerD = prjFile.value("lower").toDouble();
+			Global::g_projectInfo.laserItemList.append(item);
 		}
 		prjFile.endArray();
-		Global::g_projectInfo.startPoint = prjFile.value("OVERRALL/StartPoint").toPointF();
-		Global::g_projectInfo.nSubGroup = prjFile.value("OVERRALL/SubgroupSize").toInt();
+		Global::g_projectInfo.startCADPos = prjFile.value("OVERRALL/StartCADPos").toPointF();
+		Global::g_projectInfo.nSubGroupSize = prjFile.value("OVERRALL/SubGroupSize").toInt();
 
 		emit ProjectLoad();
 		UpdateNodeListTable();
-		Global::g_isLocked = true;
+		Global::g_lockConfig = true;
+		Global::Sync();
+		ui.startBtn->setText("开始（"+QString::number(Global::IndexGen(false))+")");
 	}
 }
 
 void CentralWidget::on_saveBtn_clicked()
 {
 	QString prj = QFileDialog::getSaveFileName(this, tr("保存项目文件"),
-		PROJECT_DIRECTORY + Global::g_projectInfo.projectName + ".prj", tr("Project (*.prj)"));
+		PROJECT_DIRECTORY + Global::g_projectInfo.projectName + "_" +
+		QString::number(Global::g_projectInfo.nSubGroupSize) +
+		".prj", tr("Project (*.prj)"));
 	QSettings prjFile(prj, QSettings::IniFormat);
 	if (!prj.isEmpty()) {
-		if (Global::g_projectInfo.camSequence.isEmpty()) {
+		if (Global::g_projectInfo.camMeasurePath.isEmpty()) {
 			QMessageBox::warning(this, tr("提示"), tr("项目信息不完整！"));
 		}
 		else {
 			// Save
 			QSettings prjFile(prj, QSettings::IniFormat);
 			prjFile.setValue("OVERRALL/ProjectName", Global::g_projectInfo.projectName);
-			prjFile.setValue("OVERRALL/CAD", Global::g_projectInfo.cadFile);
+			prjFile.setValue("OVERRALL/CADFileName", Global::g_projectInfo.cadFileName);
 			prjFile.setValue("OVERRALL/PartName", Global::g_projectInfo.partName);
 			prjFile.setValue("OVERRALL/ProductModel", Global::g_projectInfo.productModel);
 			prjFile.setValue("OVERRALL/OrderNumber", Global::g_projectInfo.orderNumber);
@@ -230,50 +234,50 @@ void CentralWidget::on_saveBtn_clicked()
 			prjFile.setValue("OVERRALL/ProductionDate", Global::g_projectInfo.productionDate);
 			prjFile.setValue("OVERRALL/ProcessName", Global::g_projectInfo.processName);
 			prjFile.setValue("OVERRALL/Station", Global::g_projectInfo.station);
-			prjFile.beginWriteArray("OVERRALL/CameraSequence");
-			for (int i = 0; i < Global::g_projectInfo.camSequence.count(); ++i) {
+			prjFile.beginWriteArray("OVERRALL/CameraMeasurePath");
+			for (int i = 0; i < Global::g_projectInfo.camMeasurePath.count(); ++i) {
 				prjFile.setArrayIndex(i);
-				prjFile.setValue("idx", Global::g_projectInfo.camSequence.at(i));
+				prjFile.setValue("idx", Global::g_projectInfo.camMeasurePath.at(i));
 			}
 			prjFile.endArray();
-			prjFile.beginWriteArray("OVERRALL/CameraItem");
-			for (int i = 0; i < Global::g_projectInfo.camearItems.count(); ++i) {
+			prjFile.beginWriteArray("OVERRALL/CameraItemList");
+			for (int i = 0; i < Global::g_projectInfo.camItemList.count(); ++i) {
 				prjFile.setArrayIndex(i);
-				prjFile.beginWriteArray("OVERRALL/CameraItem/Node");
-				for (int j = 0; j < Global::g_projectInfo.camearItems.at(i).cadPos.count(); ++j) {
+				prjFile.beginWriteArray("OVERRALL/CameraItemList/CADPosList");
+				for (int j = 0; j < Global::g_projectInfo.camItemList.at(i).cadPosList.count(); ++j) {
 					prjFile.setArrayIndex(j);
-					prjFile.setValue("_p", Global::g_projectInfo.camearItems.at(i).cadPos.at(j));
+					prjFile.setValue("_p", Global::g_projectInfo.camItemList.at(i).cadPosList.at(j));
 				}
 				prjFile.endArray();
-				prjFile.setValue("invert", Global::g_projectInfo.camearItems.at(i).bIsInverted);
-				prjFile.setValue("type", Global::g_projectInfo.camearItems.at(i).nType);
-				prjFile.setValue("content", Global::g_projectInfo.camearItems.at(i).content);
-				prjFile.setValue("height", Global::g_projectInfo.camearItems.at(i).nCADHeight);
-				prjFile.setValue("standard", Global::g_projectInfo.camearItems.at(i).dStandard);
-				prjFile.setValue("upper", Global::g_projectInfo.camearItems.at(i).dUpper);
-				prjFile.setValue("lower", Global::g_projectInfo.camearItems.at(i).dLower);
+				prjFile.setValue("invert", Global::g_projectInfo.camItemList.at(i).bPosListInverted);
+				prjFile.setValue("type", Global::g_projectInfo.camItemList.at(i).nType);
+				prjFile.setValue("content", Global::g_projectInfo.camItemList.at(i).content);
+				prjFile.setValue("height", Global::g_projectInfo.camItemList.at(i).nCADHeight);
+				prjFile.setValue("standard", Global::g_projectInfo.camItemList.at(i).dStandardD);
+				prjFile.setValue("upper", Global::g_projectInfo.camItemList.at(i).dUpperD);
+				prjFile.setValue("lower", Global::g_projectInfo.camItemList.at(i).dLowerD);
 			}
 			prjFile.endArray();
-			prjFile.beginWriteArray("OVERRALL/LaserItem");
-			for (int i = 0; i < Global::g_projectInfo.laserItems.count(); ++i) {
+			prjFile.beginWriteArray("OVERRALL/LaserItemList");
+			for (int i = 0; i < Global::g_projectInfo.laserItemList.count(); ++i) {
 				prjFile.setArrayIndex(i);
-				prjFile.beginWriteArray("OVERRALL/LaserItem/Node");
-				for (int j = 0; j < Global::g_projectInfo.laserItems.at(i).cadPos.count(); ++j) {
+				prjFile.beginWriteArray("OVERRALL/LaserItemList/CADPosList");
+				for (int j = 0; j < Global::g_projectInfo.laserItemList.at(i).cadPosList.count(); ++j) {
 					prjFile.setArrayIndex(j);
-					prjFile.setValue("_p", Global::g_projectInfo.laserItems.at(i).cadPos.at(j));
+					prjFile.setValue("_p", Global::g_projectInfo.laserItemList.at(i).cadPosList.at(j));
 				}
 				prjFile.endArray();
-				prjFile.setValue("content", Global::g_projectInfo.laserItems.at(i).content);
-				prjFile.setValue("height", Global::g_projectInfo.laserItems.at(i).nCADHeight);
-				prjFile.setValue("standard", Global::g_projectInfo.laserItems.at(i).dStandard);
-				prjFile.setValue("upper", Global::g_projectInfo.laserItems.at(i).dUpper);
-				prjFile.setValue("lower", Global::g_projectInfo.laserItems.at(i).dLower);
+				prjFile.setValue("content", Global::g_projectInfo.laserItemList.at(i).content);
+				prjFile.setValue("height", Global::g_projectInfo.laserItemList.at(i).nCADHeight);
+				prjFile.setValue("standard", Global::g_projectInfo.laserItemList.at(i).dStandardD);
+				prjFile.setValue("upper", Global::g_projectInfo.laserItemList.at(i).dUpperD);
+				prjFile.setValue("lower", Global::g_projectInfo.laserItemList.at(i).dLowerD);
 			}
 			prjFile.endArray();
-			prjFile.setValue("OVERRALL/StartPoint", Global::g_projectInfo.startPoint);
-			prjFile.setValue("OVERRALL/SubgroupSize", Global::g_projectInfo.nSubGroup);
+			prjFile.setValue("OVERRALL/StartCADPos", Global::g_projectInfo.startCADPos);
+			prjFile.setValue("OVERRALL/SubGroupSize", Global::g_projectInfo.nSubGroupSize);
 		}
-		Global::g_isLocked = true;
+		Global::g_lockConfig = true;
 	}
 }
 
@@ -289,51 +293,52 @@ void CentralWidget::ShowResult()
 	Global::g_projectInfo.mesurementDate = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 	reporter->RefreshData();
 	reporter->exec();
+	ui.startBtn->setText("开始（" + QString::number(Global::IndexGen(true)) + ")");
 }
 
 void CentralWidget::ModifyData(QStandardItem* item)
 {
 	if (item->column() == 0) {
 		int row = item->row();
-		int count0 = Global::g_projectInfo.camearItems.count();
+		int count0 = Global::g_projectInfo.camItemList.count();
 
-		if (row <= count0 - 1) { Global::g_projectInfo.camearItems[row].content = item->text(); }
-		else { Global::g_projectInfo.laserItems[row - count0].content = item->text(); }
+		if (row <= count0 - 1) { Global::g_projectInfo.camItemList[row].content = item->text(); }
+		else { Global::g_projectInfo.laserItemList[row - count0].content = item->text(); }
 	}
 
 	if (item->column() == 1) {
 		int row = item->row();
-		int count0 = Global::g_projectInfo.camearItems.count();
+		int count0 = Global::g_projectInfo.camItemList.count();
 		int newHeight = item->text().toInt();
 
-		if (row <= count0 - 1) { Global::g_projectInfo.camearItems[row].nCADHeight = newHeight; }
-		else { Global::g_projectInfo.laserItems[row - count0].nCADHeight = newHeight; }
+		if (row <= count0 - 1) { Global::g_projectInfo.camItemList[row].nCADHeight = newHeight; }
+		else { Global::g_projectInfo.laserItemList[row - count0].nCADHeight = newHeight; }
 	}
 
 	if (item->column() == 2) {
 		int row = item->row();
-		int count0 = Global::g_projectInfo.camearItems.count();
+		int count0 = Global::g_projectInfo.camItemList.count();
 		double standard = item->text().toDouble();
 
-		if (row <= count0 - 1) { Global::g_projectInfo.camearItems[row].dStandard = standard; }
-		else { Global::g_projectInfo.laserItems[row - count0].dStandard = standard; }
+		if (row <= count0 - 1) { Global::g_projectInfo.camItemList[row].dStandardD = standard; }
+		else { Global::g_projectInfo.laserItemList[row - count0].dStandardD = standard; }
 	}
 
 	if (item->column() == 3) {
 		int row = item->row();
-		int count0 = Global::g_projectInfo.camearItems.count();
+		int count0 = Global::g_projectInfo.camItemList.count();
 		double upper = item->text().toDouble();
 
-		if (row <= count0 - 1) { Global::g_projectInfo.camearItems[row].dUpper = upper; }
-		else { Global::g_projectInfo.laserItems[row - count0].dUpper = upper; }
+		if (row <= count0 - 1) { Global::g_projectInfo.camItemList[row].dUpperD = upper; }
+		else { Global::g_projectInfo.laserItemList[row - count0].dUpperD = upper; }
 	}
 
 	if (item->column() == 4) {
 		int row = item->row();
-		int count0 = Global::g_projectInfo.camearItems.count();
+		int count0 = Global::g_projectInfo.camItemList.count();
 		double lower = item->text().toDouble();
 
-		if (row <= count0 - 1) { Global::g_projectInfo.camearItems[row].dLower = lower; }
-		else { Global::g_projectInfo.laserItems[row - count0].dLower = lower; }
+		if (row <= count0 - 1) { Global::g_projectInfo.camItemList[row].dLowerD = lower; }
+		else { Global::g_projectInfo.laserItemList[row - count0].dLowerD = lower; }
 	}
 }

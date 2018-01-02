@@ -1,7 +1,7 @@
 #include "Global.h"
+#include <Qdebug>
 
-
-bool Global::g_isLocked;
+bool Global::g_lockConfig;
 
 double Global::g_pulseEquivalent;
 
@@ -22,7 +22,18 @@ ProjectInfo Global::g_projectInfo;
 SPC Global::g_spc;
 
 bool Global::g_enableCamCtrl = true;
-HObject Global::g_image;
-HTuple Global::AcqHandle;
+HObject Global::g_curPhoto;
+HTuple Global::acqHandle;
 HTuple Global::hv_window;
-QMap<QString, HObject> Global::halconData;
+
+int Global::g_index;
+
+int Global::IndexGen(bool doSubstract)
+{
+	if (doSubstract) {
+		if (g_index > 0) { g_index--; }
+		if (0 == g_index) { Sync(); }
+		return g_index;
+	}
+	return g_index;
+}

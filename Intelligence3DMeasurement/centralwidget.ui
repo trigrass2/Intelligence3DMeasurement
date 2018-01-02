@@ -91,7 +91,7 @@
      <item>
       <widget class="QPushButton" name="startBtn">
        <property name="text">
-        <string>开始</string>
+        <string>开始（0）</string>
        </property>
       </widget>
      </item>

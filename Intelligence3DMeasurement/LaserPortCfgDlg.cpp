@@ -13,8 +13,7 @@ LaserPortCfgDlg::LaserPortCfgDlg(QWidget *parent)
 	ui.setupUi(this);
 
 	// *³õÊ¼»¯ÅäÖÃ±í -BEGIN
-	//m_config.nPortName = 6;
-	m_config.nPortName = 0;
+	m_config.nPortName = 6;
 	m_config.nBaudRate = 0;
 	m_config.nDataBits = 0;
 	m_config.nParity = 0;
@@ -163,9 +162,10 @@ void LaserPortCfgDlg::GetData()
 	ui.testShowEdit->clear();
 	ui.testShowEdit->setText(data);
 
-	if (Global::g_projectInfo.laserItems.count() > 0) {
-		Global::g_projectInfo.laserItems[m_currentIndex].directReading.append(data.toDouble());
-		qDebug() << Global::g_projectInfo.laserItems[m_currentIndex].directReading.count();
+	if (Global::g_projectInfo.laserItemList.count() > 0) {
+		Global::g_projectInfo.laserItemList[m_currentIndex].sampleData << data.toDouble();
+		qDebug() << Global::g_projectInfo.laserItemList[m_currentIndex].sampleData.count();
+		qDebug() << Global::g_projectInfo.laserItemList[m_currentIndex].sampleData;
 	}
 }
 

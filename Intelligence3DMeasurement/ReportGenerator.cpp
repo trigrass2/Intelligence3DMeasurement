@@ -1,6 +1,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QCloseEvent>
 #include <QDebug>
 #include "ReportGenerator.h"
 
@@ -31,7 +32,7 @@ void ReportGenerator::RefreshData()
 		"<tr>"
 		"<td><B>零件名称 Part Name：</B></td><td>%5</td>"
 		"<td><B>产品型号 Product Model：</B></td><td>%6</td>"
-		"<td><B>订单号 Order Number：</B></td>%7<td></td>"
+		"<td><B>订单号 Order Number：</B></td><td>%7</td>"
 		"</tr>"
 		"<tr>"
 		"<td><B>工序名称 Process Name：</B></td><td>%8</td>"
@@ -74,7 +75,8 @@ void ReportGenerator::RefreshData()
 		"<td align = 'center'>%10</td><td align = 'center'> </td>"
 		"</tr>";
 
-	m_report.append(headerTemplate.arg(Global::g_projectInfo.projectName)
+	m_report.append(headerTemplate.arg(Global::g_projectInfo.projectName+"_"+
+	QString::number(Global::g_projectInfo.nSubGroupSize))
 		.arg(Global::g_projectInfo.manufactory)
 		.arg(Global::g_projectInfo.productionDate)
 		.arg(Global::g_projectInfo.mesurementDate)
@@ -85,83 +87,83 @@ void ReportGenerator::RefreshData()
 		.arg(Global::g_projectInfo.station)
 	);
 
-	for (int i = 0; i < Global::g_projectInfo.camSequence.count(); ++i) {
+	for (int i = 0; i < Global::g_projectInfo.camMeasurePath.count(); ++i) {
 		QString conclusionStr;
 		QStringList retStr;
-		double u = Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].dStandard +
-			Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].dUpper;
-		double l = Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].dStandard +
-			Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].dLower;
+		double u = Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].dStandardD +
+			Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].dUpperD;
+		double l = Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].dStandardD +
+			Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].dLowerD;
 		
 		bool isNG = false;
 		for (int j = 0; j < 7; ++j) {
-			if (Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].ret[j] >= u ||
-				Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].ret[j] <= l) {
+			if (Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].processedData[j] >= u ||
+				Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].processedData[j] <= l) {
 				retStr << "<font color='red'>" + QString::number(
-					Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].ret[j]) +
+					Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].processedData[j]) +
 					"</font>";
 				isNG = true;
 			}
 			else {
 				retStr << QString::number(
-					Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].ret[j]);
+					Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].processedData[j]);
 			};
 		}
 		if (isNG) {
-			Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].conclusion ="NG";
+			Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].conclusion ="NG";
 			conclusionStr = "<font color='red'><B>NG</B></font>";
 		}
 		else {
-			Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].conclusion ="OK";
+			Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].conclusion ="OK";
 			conclusionStr = "<font color='blue'><B>OK</B></font>";
 		}
 
-		m_report.append(dataTemplate.arg(Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].content)
+		m_report.append(dataTemplate.arg(Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].content)
 			.arg(QString::number(
-				Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].dStandard) + "|" +
+				Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].dStandardD) + "|" +
 				QString::number(
-					Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].dLower) + "|" +
+					Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].dLowerD) + "|" +
 				QString::number(
-					Global::g_projectInfo.camearItems[Global::g_projectInfo.camSequence[i]].dUpper))
+					Global::g_projectInfo.camItemList[Global::g_projectInfo.camMeasurePath[i]].dUpperD))
 			.arg(retStr[0]).arg(retStr[1]).arg(retStr[2]).arg(retStr[3]).arg(retStr[4])
 			.arg(retStr[5]).arg(retStr[6]).arg(conclusionStr)
 		);
 	}
 
-	for (int i = 0; i < Global::g_projectInfo.laserItems.count(); ++i) {
+	for (int i = 0; i < Global::g_projectInfo.laserItemList.count(); ++i) {
 		QString conclusionStr;
 		QStringList retStr;
-		double u = Global::g_projectInfo.laserItems[i].dStandard +
-			Global::g_projectInfo.laserItems[Global::g_projectInfo.camSequence[i]].dUpper;
-		double l = Global::g_projectInfo.laserItems[i].dStandard +
-			Global::g_projectInfo.laserItems[i].dLower;
+		double u = Global::g_projectInfo.laserItemList[i].dStandardD +
+			Global::g_projectInfo.laserItemList[i].dUpperD;
+		double l = Global::g_projectInfo.laserItemList[i].dStandardD +
+			Global::g_projectInfo.laserItemList[i].dLowerD;
 		
 		bool isNG = false;
 		for (int j = 0; j < 7; ++j) {
-			if (Global::g_projectInfo.laserItems[i].ret[j] >= u ||
-				Global::g_projectInfo.laserItems[i].ret[j] <= l) {
+			if (Global::g_projectInfo.laserItemList[i].processedData[j] >= u ||
+				Global::g_projectInfo.laserItemList[i].processedData[j] <= l) {
 				retStr << "<font color='red'>" + QString::number(
-					Global::g_projectInfo.laserItems[i].ret[j]) +
+					Global::g_projectInfo.laserItemList[i].processedData[j]) +
 					"</font>";
 				isNG = true;
 			}
 			else {
-				retStr << QString::number(Global::g_projectInfo.laserItems[i].ret[j]);
+				retStr << QString::number(Global::g_projectInfo.laserItemList[i].processedData[j]);
 			};
 		}
 		if (isNG) {
-			Global::g_projectInfo.laserItems[i].conclusion = "NG";
+			Global::g_projectInfo.laserItemList[i].conclusion = "NG";
 			conclusionStr = "<font color='red'><B>NG</B></font>";
 		}
 		else {
-			Global::g_projectInfo.laserItems[i].conclusion = "OK";
+			Global::g_projectInfo.laserItemList[i].conclusion = "OK";
 			conclusionStr = "<font color='blue'><B>OK</B></font>";
 		}
 
-		m_report.append(dataTemplate.arg(Global::g_projectInfo.laserItems[i].content)
-			.arg(QString::number(Global::g_projectInfo.laserItems[i].dStandard) + "|" +
-				QString::number(Global::g_projectInfo.laserItems[i].dLower) + "|" +
-				QString::number(Global::g_projectInfo.laserItems[i].dUpper))
+		m_report.append(dataTemplate.arg(Global::g_projectInfo.laserItemList[i].content)
+			.arg(QString::number(Global::g_projectInfo.laserItemList[i].dStandardD) + "|" +
+				QString::number(Global::g_projectInfo.laserItemList[i].dLowerD) + "|" +
+				QString::number(Global::g_projectInfo.laserItemList[i].dUpperD))
 			.arg(retStr[0]).arg(retStr[1]).arg(retStr[2]).arg(retStr[3]).arg(retStr[4])
 			.arg(retStr[5]).arg(retStr[6]).arg(conclusionStr)
 		);
@@ -175,23 +177,29 @@ void ReportGenerator::showEvent(QShowEvent *e)
 {
 	ui.reportArea->clear();
 	ui.reportArea->append(m_report);
+	if (Global::IndexGen(false) != 1) {ui.saveBtn->setDisabled(true);}
+	else {ui.saveBtn->setEnabled(true);}
 	QDialog::showEvent(e);
 }
 
 void ReportGenerator::closeEvent(QCloseEvent *e)
 {
 	if (m_isNew) {
-		if (QMessageBox::warning(this, "保存报表", "测量结果还未保存，确认丢弃吗？",
-			QMessageBox::Cancel | QMessageBox::Ok, QMessageBox::Cancel)== QMessageBox::Cancel){
-			return;
+		if (Global::IndexGen(false) == 1) {
+			if (QMessageBox::warning(this, "保存报表", "测量结果还未保存，确认丢弃吗？",
+				QMessageBox::Cancel | QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
+				e->ignore();
+			}
+			else { QDialog::closeEvent(e); }
 		}
 	}
-	QDialog::closeEvent(e);
 }
 
 void ReportGenerator::on_saveBtn_clicked()
 {
-	QString fileName = REPORT_DIRECTORY + Global::g_projectInfo.projectName + "_" + Global::g_projectInfo.mesurementDate + ".html";
+	QString fileName = REPORT_DIRECTORY + Global::g_projectInfo.projectName + "_" +
+		QString::number(Global::g_projectInfo.nSubGroupSize)+"_"+
+		Global::g_projectInfo.mesurementDate.split(" ").first() + ".html";
 	QFile reportFile(fileName);
 	reportFile.open(QIODevice::WriteOnly);
 
@@ -200,7 +208,9 @@ void ReportGenerator::on_saveBtn_clicked()
 	ofs << "\n";
 
 	if (DatabaseBrowser::WriteIn(ui.syncSQL->isChecked())) {
+		qDebug() << "SAVE sql";
 		m_isNew = false;
 		close();
 	}
+	qDebug() << "SAVE report";
 }

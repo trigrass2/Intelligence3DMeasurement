@@ -58,13 +58,13 @@ private slots:
 	void ClearMarkItem(int morph);
 
 	void SampleOfL2LDist();
-	void SampleOfL2LAngle();
-	void SampleOfP2PDist();
-	void SampleOfP2LDist();
-	void SampleOfRadius();
-	void SampleOfArcAngle();
-	void SampleOfCircular();
+	void SampleTheL2LAngle();
+	void SampleTheP2PDist();
+	void SampleTheP2LDist();
+	void SampleTheRadius();
+	void SampleTheArcAngle();
+	void SampleTheCircular();
 	void SampleOfLength();
-	void SampleOfStraightness();
-	void SampleOfHeight();
+	void SampleTheStraightness();
+	void SampleTheHeight();
 };

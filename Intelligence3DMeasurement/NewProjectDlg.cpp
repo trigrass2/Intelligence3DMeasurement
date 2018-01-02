@@ -24,7 +24,7 @@ void NewProjectDlg::on_confirmBtn_clicked()
 	if (name.isEmpty() || path.isEmpty()) { return; }
 
 	Global::g_projectInfo.projectName = name;
-	Global::g_projectInfo.cadFile = path;
+	Global::g_projectInfo.cadFileName = path;
 	Global::g_projectInfo.partName = ui.partName->text();
 	Global::g_projectInfo.productModel = ui.productModel->text();
 	Global::g_projectInfo.orderNumber = ui.orderNumber->text();

@@ -33,37 +33,43 @@ enum MeasureType {
 };
 
 struct CAMERAITEM {
-	int nType;							///< type of measurement
-	QString content;					///< content of measurement
-	QVector<QPointF> cadPos;			///< control points(x-y) of measurement
-	QVector<QPointF> feedbackPos;		///< real coordinate
-	int nCADHeight;						///< camera height
-	bool bIsInverted;					///< invert flag
-	int nTemp = 0;						///< reserved variable
-	double dStandard;
-	double dUpper;
-	double dLower;
-	double ret[7] = { 0,0,0,0,0,0,0 };	///< return
-	QString conclusion;					///< result
+	int nType;
+	QString content = "content";
+	double dStandardD = 0;
+	double dUpperD = 0;
+	double dLowerD = 0;
+
+	bool bPosListInverted;
+	QVector<QPointF> cadPosList;
+	QVector<QPoint> feedbackPosList;
+	int nCADHeight = 0;
+	
+	QVector<HObject> sampleData;
+	double processedData[7] = { 0,0,0,0,0,0,0 };
+	QString conclusion = "NG";
+
+	int nTemp = 0;
 };
 
 struct LASERITEM {
 	int nType;
-	QString content;
-	QVector<QPointF> cadPos;
-	QVector<QPointF> feedbackPos;
-	QVector<double> directReading;
-	int nCADHeight;						///< laser height
-	double dStandard;
-	double dUpper;
-	double dLower;
-	double ret[7] = {0,0,0,0,0,0,0};
-	QString conclusion;
+	QString content = "content";
+	double dStandardD = 0;
+	double dUpperD = 0;
+	double dLowerD = 0;
+
+	QVector<QPointF> cadPosList;
+	QVector<QPoint> feedbackPosList;
+	int nCADHeight = 0;
+
+	QVector<double> sampleData;
+	double processedData[7] = { 0,0,0,0,0,0,0 };
+	QString conclusion = "NG";
 };
 
 struct ProjectInfo {
 	QString projectName;
-	QString cadFile;
+	QString cadFileName;
 	QString partName;
 	QString productModel;
 	QString orderNumber;
@@ -72,11 +78,14 @@ struct ProjectInfo {
 	QString mesurementDate;
 	QString processName;
 	QString station;
-	QVector<int> camSequence;
-	QVector<CAMERAITEM> camearItems;
-	QVector<LASERITEM> laserItems;
-	QPointF startPoint;
-	int nSubGroup;		///< Data Process Config
+	int nSubGroupSize = 1;;
+
+	QVector<CAMERAITEM> camItemList;
+	QVector<LASERITEM> laserItemList;
+
+	QVector<int> camMeasurePath;
+	//QVector<int> laserMeasurePath;
+	QPointF startCADPos;
 };
 
 struct SPC {
@@ -94,7 +103,7 @@ struct SPC {
 class Global
 {
 public:
-	static bool g_isLocked;
+	static bool g_lockConfig;
 
 	static double g_pulseEquivalent;
 
@@ -119,9 +128,14 @@ public:
 
 	// Halcon
 	static bool g_enableCamCtrl;
-	static HObject g_image;
-	static HTuple AcqHandle;
+	static HObject g_curPhoto;
+	static HTuple acqHandle;
 	static HTuple hv_window;
-	static QMap<QString, HObject> halconData;
+
+	static int IndexGen(bool doSubstract);
+	static void Sync() { g_index = g_projectInfo.nSubGroupSize; };
+
+private:
+	static int g_index;
 };
 

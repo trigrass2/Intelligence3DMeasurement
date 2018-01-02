@@ -39,7 +39,7 @@ bool DatabaseBrowser::WriteIn(bool f)
 			"m_date DATETIME NOT NULL,"
 			"m_item VARCHAR(40),"
 			"m_dimesion VARCHAR(40) NOT NULL,";
-		for (int i = 0; i < Global::g_projectInfo.nSubGroup; ++i) {
+		for (int i = 0; i < Global::g_projectInfo.nSubGroupSize; ++i) {
 			tableTemplate.append("ipqc" + QString::number(i + 1) + " DOUBLE NOT NULL,");
 		}
 		tableTemplate.append(
@@ -47,47 +47,48 @@ bool DatabaseBrowser::WriteIn(bool f)
 			"subgroup INT(11) NOT NULL,"
 			"PRIMARY KEY(ID));");
 
-		q.exec(tableTemplate.arg(Global::g_projectInfo.projectName));
+		q.exec(tableTemplate.arg(Global::g_projectInfo.projectName +"_"+
+			QString::number(Global::g_projectInfo.nSubGroupSize)));
 
-		QString dataTemplate = "INSERT INTO " + Global::g_projectInfo.projectName +
+		QString dataTemplate = "INSERT INTO " + Global::g_projectInfo.projectName +"_"+
+			QString::number(Global::g_projectInfo.nSubGroupSize) +
 			"(product_model,order_number,m_date,m_item,m_dimesion,";
-		for (int i = 0; i < Global::g_projectInfo.nSubGroup; ++i) {
+		for (int i = 0; i < Global::g_projectInfo.nSubGroupSize; ++i) {
 			dataTemplate.append("ipqc" + QString::number(i + 1) + ",");
 		}
 		dataTemplate.append("m_result,subgroup) VALUES('"+Global::g_projectInfo.productModel+
 			"','"+Global::g_projectInfo.orderNumber+"','"+
 			Global::g_projectInfo.mesurementDate+"',%1,%2,");
 		int t = 0;
-		for (; t < Global::g_projectInfo.nSubGroup; ++t) {
+		for (; t < Global::g_projectInfo.nSubGroupSize; ++t) {
 			dataTemplate.append("%" + QString::number(t + 3) + ",");
 		}
 		dataTemplate.append("%" + QString::number(t + 4) + ",");
-		dataTemplate.append(QString::number(Global::g_projectInfo.nSubGroup) + ");");
+		dataTemplate.append(QString::number(Global::g_projectInfo.nSubGroupSize) + ");");
 
 		bool isSuccessed = true;
-		Q_FOREACH(CAMERAITEM cam, Global::g_projectInfo.camearItems) {
+		Q_FOREACH(CAMERAITEM cam, Global::g_projectInfo.camItemList) {
 			QString cmd = dataTemplate.arg("'"+cam.content+"'").arg(
-				"'" + QString::number(cam.dStandard) + "|" +
-				QString::number(cam.dLower) + "|" + QString::number(cam.dUpper) + "'");
-			for (int i = 0; i < Global::g_projectInfo.nSubGroup; ++i) {
-				cmd = cmd.arg(QString::number(cam.ret[i]));
+				"'" + QString::number(cam.dStandardD) + "|" +
+				QString::number(cam.dLowerD) + "|" + QString::number(cam.dUpperD) + "'");
+			for (int i = 0; i < Global::g_projectInfo.nSubGroupSize; ++i) {
+				cmd = cmd.arg(QString::number(cam.processedData[i]));
 			}
 			cmd = cmd.arg("'" + cam.conclusion + "'");
 			qDebug() << cmd;
 			isSuccessed = isSuccessed & q.exec(cmd);
 			qDebug() << q.lastError();
 		}
-		Q_FOREACH(LASERITEM la, Global::g_projectInfo.laserItems) {
+		Q_FOREACH(LASERITEM la, Global::g_projectInfo.laserItemList) {
 			QString cmd = dataTemplate.arg("'" + la.content + "'").arg(
-				"'" + QString::number(la.dStandard) + "|" +
-				QString::number(la.dLower) + "|" + QString::number(la.dUpper) + "'");
-			for (int i = 0; i < Global::g_projectInfo.nSubGroup; ++i) {
-				cmd = cmd.arg(QString::number(la.ret[i]));
+				"'" + QString::number(la.dStandardD) + "|" +
+				QString::number(la.dLowerD) + "|" + QString::number(la.dUpperD) + "'");
+			for (int i = 0; i < Global::g_projectInfo.nSubGroupSize; ++i) {
+				cmd = cmd.arg(QString::number(la.processedData[i]));
 			}
 			cmd = cmd.arg("'" + la.conclusion + "'");
 			qDebug() << cmd;
 			isSuccessed = isSuccessed & q.exec(cmd);
-			qDebug() << q.lastError();
 		}
 
 		if (isSuccessed) {
@@ -141,7 +142,7 @@ void DatabaseBrowser::on_spcBtn_clicked()
 	items << "NULL";
 
 	QSqlQuery q;
-	q.exec("SELECT Content FROM " + Global::g_spc.table);
+	q.exec("SELECT m_item FROM " + Global::g_spc.table);
 	while (q.next()) { items << q.value(0).toString(); }
 	items.removeDuplicates();
 

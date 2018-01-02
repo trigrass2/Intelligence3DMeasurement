@@ -110,11 +110,13 @@ public:
 
         xmedRChkBox = new QCheckBox(DataRangeSelector);
         xmedRChkBox->setObjectName(QStringLiteral("xmedRChkBox"));
+        xmedRChkBox->setEnabled(false);
 
         gridLayout->addWidget(xmedRChkBox, 2, 3, 1, 2);
 
         xRsChkBox = new QCheckBox(DataRangeSelector);
         xRsChkBox->setObjectName(QStringLiteral("xRsChkBox"));
+        xRsChkBox->setEnabled(false);
 
         gridLayout->addWidget(xRsChkBox, 2, 5, 1, 1);
 

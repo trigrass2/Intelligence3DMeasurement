@@ -104,6 +104,9 @@
      </item>
      <item row="2" column="3" colspan="2">
       <widget class="QCheckBox" name="xmedRChkBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Xmed-R</string>
        </property>
@@ -111,6 +114,9 @@
      </item>
      <item row="2" column="5">
       <widget class="QCheckBox" name="xRsChkBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>X-Rs</string>
        </property>

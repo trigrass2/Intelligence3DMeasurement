@@ -3,19 +3,25 @@
 
 #include "Global.h"
 
-#include <HALCONCpp/HalconCpp.h>
-#include <HALCONCpp/HDevThread.h>
-using namespace HalconCpp;
 
 Vision::Vision(QObject *parent)
 	: QObject(parent)
 {
-	// 初始化相机 qdebug
+	// 初始化相机
+#if ENABLE_VISION_MODULE
+	OpenFramegrabber("GigEVision", 0, 0, 0, 0, 0, 0, "default", -1, "default", -1,
+		"false", "default", "000748cef970_TheImagingSourceEuropeGmbH_DMK23GP", 0, -1,
+		&Global::acqHandle);
+	GrabImageStart(Global::acqHandle, -1);
+#endif // ENABLE_VISION_MODULE
 }
 
 Vision::~Vision()
 {
 	// 关闭相机
+#if ENABLE_VISION_MODULE
+	CloseAllFramegrabbers();
+#endif // ENABLE_VISION_MODULE
 }
 
 void Vision::ImgProc()
@@ -30,23 +36,21 @@ void Vision::ImgProc()
 
 
 	//每采集一张图运行一次该程序，根据检测项目存储坐标点结果信息，最后处理结果。
-	for (int i = 0; i < Global::g_projectInfo.camSequence.count(); ++i)		// 得到索引
+	for (int i = 0; i < Global::g_projectInfo.camMeasurePath.count(); ++i)		// 得到索引
 	{
 		HTuple i_ = 0;
-		Q_FOREACH(QString name, Global::halconData.keys()) {
-			if (name.split("_").first().toInt() == Global::g_projectInfo.camSequence[i]) {
-				// 找到了对应的图
-				
-				i_=i_+1;
-				ho_Image = Global::halconData.value(name);
+		Q_FOREACH(CAMERAITEM cam, Global::g_projectInfo.camItemList) {
+			for (int i = 0; i < cam.feedbackPosList.count(); ++i) {
+				ho_Image = cam.sampleData[i];
 				WriteImage(ho_Image, "bmp", 0, "E:/SmartTest20171210/SmartTest/temp/" + i_ + ".bmp");
-				// 下面找坐标
+				i_ = i_ + 1;
+
 				double tx, ty;
-				tx = name.split("_")[1].toInt();
-				ty = name.split("_").last().toInt();
+				tx = cam.feedbackPosList[i].x();
+				ty = cam.feedbackPosList[i].y();
 				qDebug() <<"idx"<<i<< "tx" << tx << "ty" << ty;
 
-				if (Global::g_projectInfo.camearItems[i].nType == L2LD)   // LL
+				if (Global::g_projectInfo.camItemList[i].nType == L2LD)   // LL
 				{
 					ThresholdSubPix(ho_Image, &ho_Border, 10);
 					UnionCollinearContoursXld(ho_Border, &ho_UnionContours, 50, 2, 18, 0.7, "attr_keep");
@@ -56,8 +60,8 @@ void Vision::ImgProc()
 						&hv_RowEnd, &hv_ColEnd, &hv_Nr, &hv_Nc, &hv_Dist);
 
 					//水平方向线线距
-					if (abs(Global::g_projectInfo.camearItems[i].cadPos[0].x() -
-						Global::g_projectInfo.camearItems[i].cadPos[1].x()) == 0)
+					if (abs(Global::g_projectInfo.camItemList[i].cadPosList[0].x() -
+						Global::g_projectInfo.camItemList[i].cadPosList[1].x()) == 0)
 					{
 						for (int m = 0; m < hv_Nr.Length(); m++)
 						{
@@ -70,8 +74,8 @@ void Vision::ImgProc()
 						}
 					}
 					//竖直方向线线距
-					if (abs(Global::g_projectInfo.camearItems[i].cadPos[0].y() -
-						Global::g_projectInfo.camearItems[i].cadPos[1].y()) ==0)
+					if (abs(Global::g_projectInfo.camItemList[i].cadPosList[0].y() -
+						Global::g_projectInfo.camItemList[i].cadPosList[1].y()) ==0)
 					{
 						for (int m = 0; m < hv_Nr.Length(); m++)
 						{
@@ -85,7 +89,7 @@ void Vision::ImgProc()
 					}
 				}
 
-				if (Global::g_projectInfo.camearItems[i].nType == P2PD) //Circle
+				if (Global::g_projectInfo.camItemList[i].nType == P2PD) //Circle
 				{
 					//Circle  计算孔
 
@@ -110,17 +114,17 @@ void Vision::ImgProc()
 
 				}
 
-				if (Global::g_projectInfo.camearItems[i].nType == 2)  //angle
+				if (Global::g_projectInfo.camItemList[i].nType == 2)  //angle
 				{
 
 				}
 			}
 		}
-		
+		Global::g_projectInfo.camItemList[i].processedData[Global::g_projectInfo.nSubGroupSize-Global::IndexGen(false)] = 1;
 	}
 	
 	//返回当前点图像坐标和检测项目类别信息
 	//  return row,col,(R),type; 
-
+	
 	emit VisionProcessDone();
 }
